@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>墨言 · 博客</title>
+    <title>墨言 · 博客 · 标签分类</title>
 
     <!-- ===== 使用 CDN 加载 marked 和 highlight.js ===== -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
@@ -34,9 +34,11 @@
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             --max-width: 820px;
             --header-height: 64px;
+            --tag-bg: #eef3f8;
+            --tag-hover: #dce6f0;
         }
 
-        /* 深色主题 (可通过 JS 切换) */
+        /* 深色主题 */
         [data-theme="dark"] {
             --bg: #0f1724;
             --card-bg: #1a2538;
@@ -46,6 +48,8 @@
             --border: #2a3a50;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --tag-bg: #1e2d42;
+            --tag-hover: #2a3d58;
         }
 
         /* ---------- 重置 & 基础 ---------- */
@@ -56,11 +60,9 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         html {
             scroll-behavior: smooth;
         }
-
         body {
             font-family: var(--font);
             background: var(--bg);
@@ -70,7 +72,6 @@
             padding-top: var(--header-height);
             min-height: 100vh;
         }
-
         a {
             color: var(--primary);
             text-decoration: none;
@@ -209,10 +210,10 @@
         }
 
         /* ============================================================
-               首页 - 文章列表
+               首页 - 标签栏
                ============================================================ */
         .page-home .home-header {
-            margin-bottom: 36px;
+            margin-bottom: 16px;
         }
         .page-home .home-header h1 {
             font-size: 2.2rem;
@@ -223,9 +224,71 @@
         .page-home .home-header p {
             color: var(--text-secondary);
             font-size: 1.05rem;
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
+        /* 标签筛选栏 */
+        .tag-filter {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 10px;
+            padding: 14px 0 18px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .tag-filter .tag-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-right: 6px;
+            letter-spacing: 0.3px;
+        }
+        .tag-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--tag-bg);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .tag-btn:hover {
+            background: var(--tag-hover);
+            border-color: var(--primary-light);
+            color: var(--text);
+        }
+        .tag-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(59, 110, 165, 0.25);
+        }
+        .tag-btn.active:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        .tag-btn .count {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            font-weight: 400;
+            margin-left: 2px;
+        }
+        .tag-btn.active .count {
+            opacity: 0.9;
+        }
+
+        /* ============================================================
+               文章列表
+               ============================================================ */
         .post-list {
             display: flex;
             flex-direction: column;
@@ -252,9 +315,10 @@
 
         .post-card .meta {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
-            gap: 12px;
-            font-size: 0.85rem;
+            gap: 8px 14px;
+            font-size: 0.82rem;
             color: var(--text-muted);
             margin-bottom: 8px;
         }
@@ -263,13 +327,26 @@
             align-items: center;
             gap: 4px;
         }
-        .post-card .meta .tag {
-            background: var(--bg);
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
+        .post-card .meta .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 6px;
+        }
+        .post-card .meta .post-tag {
+            background: var(--tag-bg);
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
             color: var(--text-secondary);
             border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all var(--transition);
+            line-height: 1.6;
+        }
+        .post-card .meta .post-tag:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
         }
 
         .post-card h2 {
@@ -313,6 +390,22 @@
             transform: translateX(4px);
         }
 
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .icon {
+            font-size: 2.6rem;
+            margin-bottom: 10px;
+        }
+        .empty-state h3 {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
         /* ============================================================
                文章详情页
                ============================================================ */
@@ -335,19 +428,40 @@
 
         .post-detail .post-meta {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
-            gap: 18px;
+            gap: 12px 20px;
             color: var(--text-muted);
             font-size: 0.9rem;
             border-bottom: 1px solid var(--border);
             padding-bottom: 18px;
             margin-bottom: 28px;
-            flex-wrap: wrap;
         }
         .post-detail .post-meta .date {
             display: flex;
             align-items: center;
             gap: 4px;
+        }
+        .post-detail .post-meta .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .post-detail .post-meta .detail-tag {
+            background: var(--tag-bg);
+            padding: 2px 14px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all var(--transition);
+            line-height: 1.6;
+        }
+        .post-detail .post-meta .detail-tag:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
         }
 
         /* ---------- Markdown 渲染内容 ---------- */
@@ -379,11 +493,9 @@
         .post-content h3 {
             font-size: 1.25rem;
         }
-
         .post-content p {
             margin: 1em 0;
         }
-
         .post-content a {
             color: var(--primary);
             text-decoration: underline;
@@ -392,7 +504,6 @@
         .post-content a:hover {
             color: var(--primary-dark);
         }
-
         .post-content ul,
         .post-content ol {
             padding-left: 1.6em;
@@ -401,7 +512,6 @@
         .post-content li {
             margin: 0.3em 0;
         }
-
         .post-content blockquote {
             border-left: 4px solid var(--primary);
             background: var(--bg);
@@ -413,7 +523,6 @@
         .post-content blockquote p {
             margin: 0.4em 0;
         }
-
         .post-content code {
             font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
             font-size: 0.9em;
@@ -440,7 +549,6 @@
             font-size: inherit;
             color: inherit;
         }
-
         .post-content img {
             max-width: 100%;
             height: auto;
@@ -464,7 +572,6 @@
             background: var(--bg);
             font-weight: 600;
         }
-
         .post-content hr {
             border: none;
             border-top: 2px dashed var(--border);
@@ -576,16 +683,40 @@
                 font-size: 0.85rem;
                 padding: 4px 12px;
             }
+            .tag-filter {
+                gap: 6px 8px;
+                padding: 10px 0 14px;
+            }
+            .tag-btn {
+                font-size: 0.78rem;
+                padding: 4px 12px;
+            }
+            .post-card .meta {
+                font-size: 0.75rem;
+                gap: 6px 10px;
+            }
+            .post-card .meta .post-tag {
+                font-size: 0.65rem;
+                padding: 1px 8px;
+            }
+            .post-detail .post-meta {
+                font-size: 0.8rem;
+                gap: 8px 14px;
+            }
+            .post-detail .post-meta .detail-tag {
+                font-size: 0.7rem;
+                padding: 1px 10px;
+            }
         }
 
         @media (max-width: 420px) {
             .post-detail .post-meta {
-                font-size: 0.8rem;
-                gap: 10px;
+                gap: 6px 10px;
             }
             .post-card .meta {
-                font-size: 0.75rem;
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
             }
         }
 
@@ -643,6 +774,11 @@
                 <h1>📖 所有文章</h1>
                 <p>用文字记录思考，以代码构建世界</p>
             </div>
+            <!-- 标签筛选栏 -->
+            <div id="tagFilter" class="tag-filter">
+                <!-- 由 JavaScript 动态渲染 -->
+            </div>
+            <!-- 文章列表 -->
             <div id="postList" class="post-list">
                 <!-- 由 JavaScript 动态渲染 -->
                 <div class="loading-state">
@@ -681,28 +817,24 @@
 
             // ---------- 配置 ----------
             const CONFIG = {
-                // 文章索引文件路径
                 indexUrl: 'index.json',
-                // 文章存放目录
                 postsDir: 'posts/',
-                // 默认文章 ID（当 URL 中没有指定时）
-                defaultPost: null,
             };
 
             // ---------- DOM 引用 ----------
             const $ = (sel) => document.querySelector(sel);
-            const $$ = (sel) => document.querySelectorAll(sel);
-
             const pageHome = $('#pageHome');
             const pagePost = $('#pagePost');
+            const tagFilter = $('#tagFilter');
             const postList = $('#postList');
             const postDetail = $('#postDetail');
             const backBtn = $('#backBtn');
             const themeToggle = $('#themeToggle');
 
             // ---------- 状态 ----------
-            let posts = []; // 文章列表
-            let currentPostId = null; // 当前文章 ID
+            let posts = [];
+            let currentTag = 'all'; // 'all' 或具体标签名
+            let currentPostId = null;
             let isLoading = false;
 
             // ---------- 主题切换 ----------
@@ -718,225 +850,38 @@
                 themeToggle.textContent = isDark ? '☀️' : '🌙';
                 localStorage.setItem('blog-theme', theme);
             }
-
-            function toggleTheme() {
+            setTheme(getPreferredTheme());
+            themeToggle.addEventListener('click', () => {
                 const current = document.documentElement.getAttribute('data-theme') || 'light';
                 setTheme(current === 'dark' ? 'light' : 'dark');
-            }
-
-            // 初始化主题
-            setTheme(getPreferredTheme());
-            themeToggle.addEventListener('click', toggleTheme);
+            });
 
             // ---------- 路由 ----------
             function getPostIdFromHash() {
                 const hash = window.location.hash.slice(1);
-                if (hash.startsWith('post/')) {
-                    return hash.slice(5);
-                }
+                if (hash.startsWith('post/')) return hash.slice(5);
                 return null;
             }
 
-            function setHash(postId) {
-                if (postId) {
-                    window.location.hash = `post/${postId}`;
+            function getTagFromHash() {
+                const hash = window.location.hash.slice(1);
+                if (hash.startsWith('tag/')) return decodeURIComponent(hash.slice(4));
+                return null;
+            }
+
+            function setHashForTag(tag) {
+                if (tag && tag !== 'all') {
+                    window.location.hash = `tag/${encodeURIComponent(tag)}`;
                 } else {
                     window.location.hash = '';
                 }
             }
 
-            // ---------- 渲染：首页 ----------
-            function renderHome() {
-                pageHome.classList.remove('hidden');
-                pagePost.classList.add('hidden');
-                backBtn.classList.remove('visible');
-
-                if (posts.length === 0) {
-                    postList.innerHTML = `
-                        <div class="error-state">
-                            <div class="icon">📭</div>
-                            <h2>还没有文章</h2>
-                            <p>请在 <code>posts/</code> 目录中添加 Markdown 文件，并更新 <code>index.json</code></p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // 按日期降序排列（最新的在前）
-                const sorted = [...posts].sort((a, b) => {
-                    return new Date(b.date) - new Date(a.date);
-                });
-
-                let html = '';
-                for (const post of sorted) {
-                    const dateStr = formatDate(post.date);
-                    const summary = post.summary || '点击阅读全文…';
-                    html += `
-                        <article class="post-card fade-in" data-id="${post.id}">
-                            <div class="meta">
-                                <span class="date">📅 ${dateStr}</span>
-                                ${post.tag ? `<span class="tag">#${post.tag}</span>` : ''}
-                            </div>
-                            <h2><a href="#post/${post.id}">${escapeHtml(post.title)}</a></h2>
-                            <p class="summary">${escapeHtml(summary)}</p>
-                            <span class="read-more">阅读全文</span>
-                        </article>
-                    `;
-                }
-                postList.innerHTML = html;
-
-                // 点击卡片跳转
-                postList.querySelectorAll('.post-card').forEach(card => {
-                    card.addEventListener('click', function(e) {
-                        // 如果点击的是内部的 a 标签，不重复触发
-                        if (e.target.closest('a')) return;
-                        const id = this.dataset.id;
-                        if (id) navigateToPost(id);
-                    });
-                });
-            }
-
-            // ---------- 渲染：文章详情 ----------
-            async function renderPost(postId) {
-                // 查找文章元数据
-                const meta = posts.find(p => p.id === postId);
-                if (!meta) {
-                    postDetail.innerHTML = `
-                        <div class="error-state">
-                            <div class="icon">🔍</div>
-                            <h2>文章未找到</h2>
-                            <p>ID: "${escapeHtml(postId)}" 不存在，请检查链接。</p>
-                            <p style="margin-top:12px;"><a href="#/" style="text-decoration:underline;">返回首页</a></p>
-                        </div>
-                    `;
-                    pageHome.classList.add('hidden');
-                    pagePost.classList.remove('hidden');
-                    backBtn.classList.add('visible');
-                    return;
-                }
-
-                // 显示加载状态
-                postDetail.innerHTML = `
-                    <div class="loading-state">
-                        <div class="spinner"></div>
-                        <p>加载文章内容...</p>
-                    </div>
-                `;
-                pageHome.classList.add('hidden');
-                pagePost.classList.remove('hidden');
-                backBtn.classList.add('visible');
-
-                try {
-                    const mdUrl = `${CONFIG.postsDir}${meta.filename}`;
-                    const response = await fetch(mdUrl);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const mdText = await response.text();
-
-                    // 使用 marked 渲染 Markdown
-                    const htmlContent = marked.parse(mdText);
-
-                    // 渲染文章
-                    const dateStr = formatDate(meta.date);
-                    postDetail.innerHTML = `
-                        <h1 class="post-title">${escapeHtml(meta.title)}</h1>
-                        <div class="post-meta">
-                            <span class="date">📅 ${dateStr}</span>
-                            ${meta.tag ? `<span>🏷️ ${escapeHtml(meta.tag)}</span>` : ''}
-                            <span>📄 ${meta.filename}</span>
-                        </div>
-                        <div class="post-content fade-in">
-                            ${htmlContent}
-                        </div>
-                    `;
-
-                    // 高亮代码块
-                    if (typeof hljs !== 'undefined') {
-                        document.querySelectorAll('.post-content pre code').forEach(block => {
-                            hljs.highlightElement(block);
-                        });
-                    }
-
-                    currentPostId = postId;
-                    setHash(postId);
-
-                } catch (err) {
-                    console.error('加载文章失败:', err);
-                    postDetail.innerHTML = `
-                        <div class="error-state">
-                            <div class="icon">⚠️</div>
-                            <h2>加载失败</h2>
-                            <p>无法读取文章内容，请检查网络或文件路径。</p>
-                            <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);">${escapeHtml(err.message)}</p>
-                            <p style="margin-top:12px;"><a href="#/" style="text-decoration:underline;">返回首页</a></p>
-                        </div>
-                    `;
-                }
-            }
-
-            // ---------- 导航 ----------
-            function navigateToPost(postId) {
-                if (isLoading) return;
-                isLoading = true;
-                renderPost(postId).finally(() => {
-                    isLoading = false;
-                });
-            }
-
-            function navigateHome() {
-                if (isLoading) return;
-                window.location.hash = '';
-                pageHome.classList.remove('hidden');
-                pagePost.classList.add('hidden');
-                backBtn.classList.remove('visible');
-                currentPostId = null;
-                // 重新渲染首页（保证列表最新）
-                renderHome();
-            }
-
-            // ---------- 路由处理 ----------
-            function handleRoute() {
-                const postId = getPostIdFromHash();
+            function setHashForPost(postId) {
                 if (postId) {
-                    // 如果文章列表还没加载，先加载再跳转
-                    if (posts.length === 0) {
-                        loadIndex().then(() => {
-                            navigateToPost(postId);
-                        });
-                    } else {
-                        navigateToPost(postId);
-                    }
+                    window.location.hash = `post/${postId}`;
                 } else {
-                    if (posts.length === 0) {
-                        loadIndex().then(() => {
-                            renderHome();
-                        });
-                    } else {
-                        renderHome();
-                    }
-                }
-            }
-
-            // ---------- 加载文章索引 ----------
-            async function loadIndex() {
-                try {
-                    const response = await fetch(CONFIG.indexUrl);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const data = await response.json();
-                    if (!Array.isArray(data)) throw new Error('索引格式错误：应为数组');
-                    posts = data.filter(item => item.id && item.title && item.filename);
-                    return posts;
-                } catch (err) {
-                    console.error('加载索引失败:', err);
-                    posts = [];
-                    postList.innerHTML = `
-                        <div class="error-state">
-                            <div class="icon">📂</div>
-                            <h2>加载索引失败</h2>
-                            <p>无法读取 <code>index.json</code>，请确保文件存在且格式正确。</p>
-                            <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);">${escapeHtml(err.message)}</p>
-                        </div>
-                    `;
-                    throw err;
+                    window.location.hash = '';
                 }
             }
 
@@ -967,11 +912,331 @@
                 return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
             }
 
-            // ---------- 监听路由变化 ----------
-            window.addEventListener('hashchange', handleRoute);
+            // ---------- 获取所有标签及计数 ----------
+            function getAllTags(posts) {
+                const tagMap = new Map();
+                for (const p of posts) {
+                    if (p.tags && Array.isArray(p.tags)) {
+                        for (const t of p.tags) {
+                            const key = String(t).trim();
+                            if (key) {
+                                tagMap.set(key, (tagMap.get(key) || 0) + 1);
+                            }
+                        }
+                    }
+                }
+                // 按标签名排序
+                const sorted = Array.from(tagMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+                return sorted.map(([name, count]) => ({ name, count }));
+            }
+
+            // ---------- 筛选文章 ----------
+            function getFilteredPosts(tag) {
+                if (!tag || tag === 'all') return posts;
+                return posts.filter(p => {
+                    if (!p.tags || !Array.isArray(p.tags)) return false;
+                    return p.tags.some(t => String(t).trim() === tag);
+                });
+            }
+
+            // ---------- 渲染：标签栏 ----------
+            function renderTags(activeTag) {
+                const allTags = getAllTags(posts);
+                let html = `<span class="tag-label">🏷️ 分类</span>`;
+                // "全部" 按钮
+                const allCount = posts.length;
+                html += `
+                    <button class="tag-btn ${activeTag === 'all' ? 'active' : ''}" data-tag="all">
+                        全部 <span class="count">(${allCount})</span>
+                    </button>
+                `;
+                for (const t of allTags) {
+                    const isActive = activeTag === t.name;
+                    html += `
+                        <button class="tag-btn ${isActive ? 'active' : ''}" data-tag="${escapeHtml(t.name)}">
+                            ${escapeHtml(t.name)} <span class="count">(${t.count})</span>
+                        </button>
+                    `;
+                }
+                tagFilter.innerHTML = html;
+
+                // 绑定点击事件
+                tagFilter.querySelectorAll('.tag-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const tag = this.dataset.tag;
+                        if (tag !== currentTag) {
+                            selectTag(tag);
+                        }
+                    });
+                });
+            }
+
+            // ---------- 渲染：文章列表 ----------
+            function renderPostList(tag) {
+                const filtered = getFilteredPosts(tag);
+                if (filtered.length === 0) {
+                    const tagDisplay = tag === 'all' ? '全部' : `"${escapeHtml(tag)}"`;
+                    postList.innerHTML = `
+                        <div class="empty-state fade-in">
+                            <div class="icon">🔍</div>
+                            <h3>没有找到标签为 ${tagDisplay} 的文章</h3>
+                            <p style="color:var(--text-muted);font-size:0.95rem;">试试其他标签或查看全部文章</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // 按日期降序排列
+                const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                let html = '';
+                for (const post of sorted) {
+                    const dateStr = formatDate(post.date);
+                    // 渲染文章标签
+                    let tagsHtml = '';
+                    if (post.tags && Array.isArray(post.tags)) {
+                        for (const t of post.tags) {
+                            const tName = String(t).trim();
+                            if (tName) {
+                                tagsHtml += `<span class="post-tag" data-tag="${escapeHtml(tName)}">#${escapeHtml(tName)}</span>`;
+                            }
+                        }
+                    }
+                    const summary = post.summary || '点击阅读全文…';
+                    html += `
+                        <article class="post-card fade-in" data-id="${post.id}">
+                            <div class="meta">
+                                <span class="date">📅 ${dateStr}</span>
+                                ${tagsHtml ? `<span class="post-tags">${tagsHtml}</span>` : ''}
+                            </div>
+                            <h2><a href="#post/${post.id}">${escapeHtml(post.title)}</a></h2>
+                            <p class="summary">${escapeHtml(summary)}</p>
+                            <span class="read-more">阅读全文</span>
+                        </article>
+                    `;
+                }
+                postList.innerHTML = html;
+
+                // 卡片点击跳转
+                postList.querySelectorAll('.post-card').forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        if (e.target.closest('a') || e.target.closest('.post-tag')) return;
+                        const id = this.dataset.id;
+                        if (id) navigateToPost(id);
+                    });
+                });
+
+                // 卡片内的标签点击筛选
+                postList.querySelectorAll('.post-tag').forEach(el => {
+                    el.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const tag = this.dataset.tag;
+                        if (tag && tag !== currentTag) {
+                            selectTag(tag);
+                        }
+                    });
+                });
+            }
+
+            // ---------- 渲染：首页 ----------
+            function renderHome(tag) {
+                pageHome.classList.remove('hidden');
+                pagePost.classList.add('hidden');
+                backBtn.classList.remove('visible');
+
+                currentTag = tag || 'all';
+                renderTags(currentTag);
+                renderPostList(currentTag);
+                setHashForTag(currentTag);
+            }
+
+            // ---------- 渲染：文章详情 ----------
+            async function renderPost(postId) {
+                const meta = posts.find(p => p.id === postId);
+                if (!meta) {
+                    postDetail.innerHTML = `
+                        <div class="error-state">
+                            <div class="icon">🔍</div>
+                            <h2>文章未找到</h2>
+                            <p>ID: "${escapeHtml(postId)}" 不存在</p>
+                            <p style="margin-top:12px;"><a href="#/" style="text-decoration:underline;">返回首页</a></p>
+                        </div>
+                    `;
+                    pageHome.classList.add('hidden');
+                    pagePost.classList.remove('hidden');
+                    backBtn.classList.add('visible');
+                    return;
+                }
+
+                postDetail.innerHTML = `
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>加载文章内容...</p>
+                    </div>
+                `;
+                pageHome.classList.add('hidden');
+                pagePost.classList.remove('hidden');
+                backBtn.classList.add('visible');
+
+                try {
+                    const mdUrl = `${CONFIG.postsDir}${meta.filename}`;
+                    const response = await fetch(mdUrl);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const mdText = await response.text();
+                    const htmlContent = marked.parse(mdText);
+
+                    const dateStr = formatDate(meta.date);
+                    // 详情页标签
+                    let detailTagsHtml = '';
+                    if (meta.tags && Array.isArray(meta.tags)) {
+                        for (const t of meta.tags) {
+                            const tName = String(t).trim();
+                            if (tName) {
+                                detailTagsHtml += `<span class="detail-tag" data-tag="${escapeHtml(tName)}">#${escapeHtml(tName)}</span>`;
+                            }
+                        }
+                    }
+
+                    postDetail.innerHTML = `
+                        <h1 class="post-title">${escapeHtml(meta.title)}</h1>
+                        <div class="post-meta">
+                            <span class="date">📅 ${dateStr}</span>
+                            ${detailTagsHtml ? `<span class="detail-tags">${detailTagsHtml}</span>` : ''}
+                            <span>📄 ${escapeHtml(meta.filename)}</span>
+                        </div>
+                        <div class="post-content fade-in">
+                            ${htmlContent}
+                        </div>
+                    `;
+
+                    // 高亮代码块
+                    if (typeof hljs !== 'undefined') {
+                        document.querySelectorAll('.post-content pre code').forEach(block => {
+                            hljs.highlightElement(block);
+                        });
+                    }
+
+                    // 详情页标签点击筛选
+                    postDetail.querySelectorAll('.detail-tag').forEach(el => {
+                        el.addEventListener('click', function() {
+                            const tag = this.dataset.tag;
+                            if (tag) {
+                                // 跳转到首页并筛选该标签
+                                selectTag(tag);
+                            }
+                        });
+                    });
+
+                    currentPostId = postId;
+                    setHashForPost(postId);
+
+                } catch (err) {
+                    console.error('加载文章失败:', err);
+                    postDetail.innerHTML = `
+                        <div class="error-state">
+                            <div class="icon">⚠️</div>
+                            <h2>加载失败</h2>
+                            <p>无法读取文章内容，请检查网络或文件路径。</p>
+                            <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);">${escapeHtml(err.message)}</p>
+                            <p style="margin-top:12px;"><a href="#/" style="text-decoration:underline;">返回首页</a></p>
+                        </div>
+                    `;
+                }
+            }
+
+            // ---------- 导航 ----------
+            function navigateToPost(postId) {
+                if (isLoading) return;
+                isLoading = true;
+                renderPost(postId).finally(() => { isLoading = false; });
+            }
+
+            function navigateHome(tag) {
+                if (isLoading) return;
+                isLoading = true;
+                // 如果传入了 tag，使用它；否则从当前 hash 解析
+                const effectiveTag = tag || currentTag || 'all';
+                renderHome(effectiveTag);
+                isLoading = false;
+            }
+
+            function selectTag(tag) {
+                if (isLoading) return;
+                if (tag === currentTag && !pageHome.classList.contains('hidden')) return;
+                // 如果当前在详情页，先切到首页
+                if (!pageHome.classList.contains('hidden')) {
+                    // 已经在首页，直接刷新
+                    renderHome(tag);
+                } else {
+                    // 从详情页切换
+                    navigateHome(tag);
+                }
+            }
+
+            // ---------- 路由处理 ----------
+            function handleRoute() {
+                const postId = getPostIdFromHash();
+                if (postId) {
+                    if (posts.length === 0) {
+                        loadIndex().then(() => { navigateToPost(postId); });
+                    } else {
+                        navigateToPost(postId);
+                    }
+                    return;
+                }
+
+                const tag = getTagFromHash();
+                if (tag) {
+                    if (posts.length === 0) {
+                        loadIndex().then(() => { renderHome(tag); });
+                    } else {
+                        renderHome(tag);
+                    }
+                    return;
+                }
+
+                // 空 hash 或 #/ → 全部文章
+                if (posts.length === 0) {
+                    loadIndex().then(() => { renderHome('all'); });
+                } else {
+                    renderHome('all');
+                }
+            }
+
+            // ---------- 加载文章索引 ----------
+            async function loadIndex() {
+                try {
+                    const response = await fetch(CONFIG.indexUrl);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    if (!Array.isArray(data)) throw new Error('索引格式错误：应为数组');
+                    posts = data.filter(item => item.id && item.title && item.filename);
+                    return posts;
+                } catch (err) {
+                    console.error('加载索引失败:', err);
+                    posts = [];
+                    postList.innerHTML = `
+                        <div class="error-state">
+                            <div class="icon">📂</div>
+                            <h2>加载索引失败</h2>
+                            <p>无法读取 <code>index.json</code>，请确保文件存在且格式正确。</p>
+                            <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);">${escapeHtml(err.message)}</p>
+                        </div>
+                    `;
+                    throw err;
+                }
+            }
 
             // ---------- 返回按钮 ----------
-            backBtn.addEventListener('click', navigateHome);
+            backBtn.addEventListener('click', function() {
+                // 如果当前在详情页，回到首页全部文章
+                if (!pageHome.classList.contains('hidden')) return;
+                // 如果有 tag 信息，清除
+                navigateHome('all');
+            });
+
+            // ---------- 监听路由变化 ----------
+            window.addEventListener('hashchange', handleRoute);
 
             // ---------- 初始化 ----------
             async function init() {
@@ -979,25 +1244,18 @@
                     await loadIndex();
                     handleRoute();
                 } catch (err) {
-                    // 错误已在 loadIndex 中处理
                     handleRoute();
                 }
             }
 
-            // 如果页面加载时已经有 hash，等 DOM 就绪后处理
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {
                 init();
             }
 
-            // 暴露给全局，方便调试
-            window.__blog = {
-                posts,
-                navigateToPost,
-                navigateHome,
-                reload: init,
-            };
+            // 暴露方便调试
+            window.__blog = { posts, currentTag, selectTag, navigateHome, navigateToPost, reload: init };
 
         })();
     </script>
