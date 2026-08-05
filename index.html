@@ -14,12 +14,11 @@
     </script>
 
     <style>
-        
         @font-face {
-          font-family: 'BlueArchive';
-          src: url('assets/fonts/font.ttf') format('truetype');
+            font-family: 'BlueArchive';
+            src: url('assets/fonts/font.ttf') format('truetype');
         }
-        
+
         /* ============================================================
                全局样式 & CSS 变量
                ============================================================ */
@@ -217,7 +216,7 @@
         }
 
         /* ============================================================
-               首页 - 标签栏
+               首页 - 标签栏 & 布局切换
                ============================================================ */
         .page-home .home-header {
             margin-bottom: 16px;
@@ -234,7 +233,7 @@
             margin-top: 4px;
         }
 
-        /* 标签筛选栏 */
+        /* 标签筛选栏 ———— 现在包含布局切换 */
         .tag-filter {
             display: flex;
             flex-wrap: wrap;
@@ -293,19 +292,143 @@
             opacity: 0.9;
         }
 
+        /* ===== 布局切换 ===== */
+        .layout-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+            padding-left: 12px;
+            border-left: 1px solid var(--border);
+        }
+        .layout-toggle .layout-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-right: 4px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+        .layout-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+            user-select: none;
+            line-height: 1.6;
+            min-height: 30px;
+        }
+        .layout-btn:hover {
+            background: var(--tag-hover);
+            border-color: var(--primary-light);
+            color: var(--text);
+        }
+        .layout-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(59, 110, 165, 0.2);
+        }
+        .layout-btn.active:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        /* 布局图标 (小方块示意) */
+        .layout-btn .icon-single,
+        .layout-btn .icon-double {
+            display: inline-flex;
+            gap: 2px;
+            align-items: center;
+            justify-content: center;
+        }
+        .layout-btn .icon-single::before {
+            content: "▦";
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+        .layout-btn .icon-double::before {
+            content: "▦▦";
+            font-size: 0.9rem;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+        .layout-btn.active .icon-single::before,
+        .layout-btn.active .icon-double::before {
+            color: #fff;
+        }
+
         /* ============================================================
-               文章列表
+               文章列表 ———— 单列 / 双列
                ============================================================ */
         .post-list {
             display: flex;
             flex-direction: column;
             gap: 20px;
+            transition: all 0.3s ease;
         }
 
+        /* ---- 双列布局 (grid) ---- */
+        .post-list.grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        /* 双列模式下卡片样式调整 */
+        .post-list.grid-layout .post-card {
+            padding: 18px 20px;
+            border-radius: var(--radius-sm);
+        }
+        .post-list.grid-layout .post-card h2 {
+            font-size: 1.1rem;
+        }
+        .post-list.grid-layout .post-card .summary {
+            font-size: 0.85rem;
+            -webkit-line-clamp: 2;
+        }
+        .post-list.grid-layout .post-card .meta {
+            font-size: 0.72rem;
+            gap: 4px 10px;
+        }
+        .post-list.grid-layout .post-card .meta .post-tag {
+            font-size: 0.6rem;
+            padding: 1px 8px;
+        }
+        .post-list.grid-layout .post-card .read-more {
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+        .post-list.grid-layout .post-card .read-more::after {
+            content: " →";
+        }
+
+        /* ---- 单列布局 (flex) 保持原样 ---- */
+        .post-list:not(.grid-layout) .post-card {
+            padding: 24px 28px;
+        }
+        .post-list:not(.grid-layout) .post-card h2 {
+            font-size: 1.35rem;
+        }
+        .post-list:not(.grid-layout) .post-card .summary {
+            font-size: 0.95rem;
+            -webkit-line-clamp: 2;
+        }
+
+        /* ============================================================
+               文章卡片 (通用)
+               ============================================================ */
         .post-card {
             background: var(--card-bg);
             border-radius: var(--radius);
-            padding: 24px 28px;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
             transition: all var(--transition);
@@ -357,7 +480,6 @@
         }
 
         .post-card h2 {
-            font-size: 1.35rem;
             font-weight: 600;
             letter-spacing: -0.3px;
             line-height: 1.4;
@@ -373,9 +495,7 @@
 
         .post-card .summary {
             color: var(--text-secondary);
-            font-size: 0.95rem;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             margin-top: 4px;
@@ -384,12 +504,11 @@
         .post-card .read-more {
             display: inline-block;
             margin-top: 12px;
-            font-size: 0.9rem;
             font-weight: 500;
             color: var(--primary);
+            transition: all var(--transition);
         }
         .post-card .read-more::after {
-            content: " →";
             transition: transform var(--transition);
             display: inline-block;
         }
@@ -637,6 +756,46 @@
         /* ============================================================
                响应式
                ============================================================ */
+        @media (max-width: 768px) {
+            /* 平板及以下：双列变单列 */
+            .post-list.grid-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .post-list.grid-layout .post-card {
+                padding: 20px 24px;
+                border-radius: var(--radius);
+            }
+            .post-list.grid-layout .post-card h2 {
+                font-size: 1.25rem;
+            }
+            .post-list.grid-layout .post-card .summary {
+                font-size: 0.92rem;
+            }
+            .post-list.grid-layout .post-card .meta {
+                font-size: 0.8rem;
+            }
+            .post-list.grid-layout .post-card .read-more {
+                font-size: 0.88rem;
+            }
+            /* 布局切换在窄屏上放在第二行 */
+            .layout-toggle {
+                margin-left: 0;
+                padding-left: 0;
+                border-left: none;
+                width: 100%;
+                justify-content: flex-start;
+                padding-top: 6px;
+            }
+            .layout-toggle .layout-label {
+                font-size: 0.8rem;
+            }
+            .layout-btn {
+                font-size: 0.8rem;
+                padding: 4px 14px;
+            }
+        }
+
         @media (max-width: 640px) {
             :root {
                 --header-height: 58px;
@@ -714,6 +873,15 @@
                 font-size: 0.7rem;
                 padding: 1px 10px;
             }
+            .layout-btn {
+                font-size: 0.72rem;
+                padding: 3px 10px;
+                min-height: 26px;
+            }
+            .layout-btn .icon-single::before,
+            .layout-btn .icon-double::before {
+                font-size: 0.75rem;
+            }
         }
 
         @media (max-width: 420px) {
@@ -781,9 +949,10 @@
                 <h1>📖 所有文章</h1>
                 <p>用文字记录思考，以代码构建世界</p>
             </div>
-            <!-- 标签筛选栏 -->
+            <!-- 标签筛选栏 + 布局切换 -->
             <div id="tagFilter" class="tag-filter">
-                <!-- 由 JavaScript 动态渲染 -->
+                <!-- 标签由 JavaScript 动态渲染 -->
+                <!-- 布局切换由 JavaScript 动态渲染 -->
             </div>
             <!-- 文章列表 -->
             <div id="postList" class="post-list">
@@ -840,9 +1009,10 @@
 
             // ---------- 状态 ----------
             let posts = [];
-            let currentTag = 'all'; // 'all' 或具体标签名
+            let currentTag = 'all';
             let currentPostId = null;
             let isLoading = false;
+            let currentLayout = 'single'; // 'single' | 'double'
 
             // ---------- 主题切换 ----------
             function getPreferredTheme() {
@@ -862,6 +1032,80 @@
                 const current = document.documentElement.getAttribute('data-theme') || 'light';
                 setTheme(current === 'dark' ? 'light' : 'dark');
             });
+
+            // ---------- 布局切换 ----------
+            function getPreferredLayout() {
+                const stored = localStorage.getItem('blog-layout');
+                if (stored === 'double' || stored === 'single') return stored;
+                // 默认根据屏幕宽度：宽屏默认双列，窄屏默认单列
+                return window.innerWidth >= 768 ? 'double' : 'single';
+            }
+
+            function setLayout(layout) {
+                currentLayout = layout;
+                localStorage.setItem('blog-layout', layout);
+                applyLayout(layout);
+                // 更新按钮状态
+                document.querySelectorAll('.layout-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.layout === layout);
+                });
+            }
+
+            function applyLayout(layout) {
+                if (layout === 'double') {
+                    postList.classList.add('grid-layout');
+                } else {
+                    postList.classList.remove('grid-layout');
+                }
+            }
+
+            function toggleLayout() {
+                const next = currentLayout === 'single' ? 'double' : 'single';
+                setLayout(next);
+            }
+
+            // ---------- 渲染：布局切换按钮 ----------
+            function renderLayoutToggle() {
+                // 检查是否已存在，避免重复渲染
+                let toggleContainer = tagFilter.querySelector('.layout-toggle');
+                if (toggleContainer) {
+                    // 更新激活状态
+                    toggleContainer.querySelectorAll('.layout-btn').forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.layout === currentLayout);
+                    });
+                    return;
+                }
+
+                toggleContainer = document.createElement('div');
+                toggleContainer.className = 'layout-toggle';
+
+                const label = document.createElement('span');
+                label.className = 'layout-label';
+                label.textContent = '📐 布局';
+                toggleContainer.appendChild(label);
+
+                const btnSingle = document.createElement('button');
+                btnSingle.className = `layout-btn ${currentLayout === 'single' ? 'active' : ''}`;
+                btnSingle.dataset.layout = 'single';
+                btnSingle.title = '单列布局';
+                btnSingle.innerHTML = `<span class="icon-single"></span> 单列`;
+                btnSingle.addEventListener('click', () => {
+                    if (currentLayout !== 'single') setLayout('single');
+                });
+                toggleContainer.appendChild(btnSingle);
+
+                const btnDouble = document.createElement('button');
+                btnDouble.className = `layout-btn ${currentLayout === 'double' ? 'active' : ''}`;
+                btnDouble.dataset.layout = 'double';
+                btnDouble.title = '双列布局';
+                btnDouble.innerHTML = `<span class="icon-double"></span> 双列`;
+                btnDouble.addEventListener('click', () => {
+                    if (currentLayout !== 'double') setLayout('double');
+                });
+                toggleContainer.appendChild(btnDouble);
+
+                tagFilter.appendChild(toggleContainer);
+            }
 
             // ---------- 路由 ----------
             function getPostIdFromHash() {
@@ -932,7 +1176,6 @@
                         }
                     }
                 }
-                // 按标签名排序
                 const sorted = Array.from(tagMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
                 return sorted.map(([name, count]) => ({ name, count }));
             }
@@ -948,9 +1191,12 @@
 
             // ---------- 渲染：标签栏 ----------
             function renderTags(activeTag) {
+                // 清除旧标签（保留布局切换）
+                const toggle = tagFilter.querySelector('.layout-toggle');
+                tagFilter.innerHTML = '';
+
                 const allTags = getAllTags(posts);
                 let html = `<span class="tag-label">🏷️ 分类</span>`;
-                // "全部" 按钮
                 const allCount = posts.length;
                 html += `
                     <button class="tag-btn ${activeTag === 'all' ? 'active' : ''}" data-tag="all">
@@ -967,7 +1213,10 @@
                 }
                 tagFilter.innerHTML = html;
 
-                // 绑定点击事件
+                // 重新插入布局切换
+                renderLayoutToggle();
+
+                // 绑定标签点击事件
                 tagFilter.querySelectorAll('.tag-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const tag = this.dataset.tag;
@@ -993,13 +1242,11 @@
                     return;
                 }
 
-                // 按日期降序排列
                 const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
 
                 let html = '';
                 for (const post of sorted) {
                     const dateStr = formatDate(post.date);
-                    // 渲染文章标签
                     let tagsHtml = '';
                     if (post.tags && Array.isArray(post.tags)) {
                         for (const t of post.tags) {
@@ -1023,6 +1270,9 @@
                     `;
                 }
                 postList.innerHTML = html;
+
+                // 应用当前布局
+                applyLayout(currentLayout);
 
                 // 卡片点击跳转
                 postList.querySelectorAll('.post-card').forEach(card => {
@@ -1093,7 +1343,6 @@
                     const htmlContent = marked.parse(mdText);
 
                     const dateStr = formatDate(meta.date);
-                    // 详情页标签
                     let detailTagsHtml = '';
                     if (meta.tags && Array.isArray(meta.tags)) {
                         for (const t of meta.tags) {
@@ -1116,19 +1365,16 @@
                         </div>
                     `;
 
-                    // 高亮代码块
                     if (typeof hljs !== 'undefined') {
                         document.querySelectorAll('.post-content pre code').forEach(block => {
                             hljs.highlightElement(block);
                         });
                     }
 
-                    // 详情页标签点击筛选
                     postDetail.querySelectorAll('.detail-tag').forEach(el => {
                         el.addEventListener('click', function() {
                             const tag = this.dataset.tag;
                             if (tag) {
-                                // 跳转到首页并筛选该标签
                                 selectTag(tag);
                             }
                         });
@@ -1161,7 +1407,6 @@
             function navigateHome(tag) {
                 if (isLoading) return;
                 isLoading = true;
-                // 如果传入了 tag，使用它；否则从当前 hash 解析
                 const effectiveTag = tag || currentTag || 'all';
                 renderHome(effectiveTag);
                 isLoading = false;
@@ -1170,12 +1415,9 @@
             function selectTag(tag) {
                 if (isLoading) return;
                 if (tag === currentTag && !pageHome.classList.contains('hidden')) return;
-                // 如果当前在详情页，先切到首页
                 if (!pageHome.classList.contains('hidden')) {
-                    // 已经在首页，直接刷新
                     renderHome(tag);
                 } else {
-                    // 从详情页切换
                     navigateHome(tag);
                 }
             }
@@ -1202,7 +1444,6 @@
                     return;
                 }
 
-                // 空 hash 或 #/ → 全部文章
                 if (posts.length === 0) {
                     loadIndex().then(() => { renderHome('all'); });
                 } else {
@@ -1236,20 +1477,42 @@
 
             // ---------- 返回按钮 ----------
             backBtn.addEventListener('click', function() {
-                // 如果当前在详情页，回到首页全部文章
                 if (!pageHome.classList.contains('hidden')) return;
-                // 如果有 tag 信息，清除
                 navigateHome('all');
             });
 
             // ---------- 监听路由变化 ----------
             window.addEventListener('hashchange', handleRoute);
 
+            // ---------- 窗口大小变化时自动调整布局 ----------
+            let resizeTimer = null;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    // 如果用户没有手动设置过布局，则根据宽度自动调整
+                    const stored = localStorage.getItem('blog-layout');
+                    if (!stored) {
+                        const preferred = window.innerWidth >= 768 ? 'double' : 'single';
+                        if (preferred !== currentLayout) {
+                            setLayout(preferred);
+                        }
+                    }
+                }, 300);
+            });
+
             // ---------- 初始化 ----------
             async function init() {
                 try {
                     await loadIndex();
+                    // 读取布局偏好
+                    const preferredLayout = getPreferredLayout();
+                    currentLayout = preferredLayout;
                     handleRoute();
+                    // 确保布局应用
+                    setTimeout(() => {
+                        applyLayout(currentLayout);
+                        renderLayoutToggle();
+                    }, 50);
                 } catch (err) {
                     handleRoute();
                 }
@@ -1262,7 +1525,17 @@
             }
 
             // 暴露方便调试
-            window.__blog = { posts, currentTag, selectTag, navigateHome, navigateToPost, reload: init };
+            window.__blog = {
+                posts,
+                currentTag,
+                currentLayout,
+                selectTag,
+                navigateHome,
+                navigateToPost,
+                setLayout,
+                toggleLayout,
+                reload: init
+            };
 
         })();
     </script>
