@@ -3,24 +3,37 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fishing's Blog - Html</title>
+    <meta name="description" content="Fishing's Blog - 用文字记录思考，以代码构建世界" />
+    <meta name="author" content="Fishing" />
+    <meta name="theme-color" content="#3b6ea5" />
+    <title>Fishing's Blog</title>
 
-    <!-- ===== 使用 CDN 加载 marked 和 highlight.js ===== -->
+    <!-- ===== Favicon ===== -->
     <link rel="icon" href="assets/icons/favicon.ico" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
-    </script>
+
+    <!-- ===== highlight.js：代码高亮主题 ===== -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+    media="screen" />
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    media="screen and (prefers-color-scheme: dark)" />
+
+    <!-- ===== 预加载关键资源 ===== -->
+    <link rel="preload" href="assets/fonts/font.ttf" as="font" type="font/ttf" crossorigin />
 
     <style>
+        /* ============================================================
+               @font-face — 自定义字体（BlueArchive 风格）
+               ============================================================ */
         @font-face {
             font-family: 'BlueArchive';
             src: url('assets/fonts/font.ttf') format('truetype');
+            font-display: swap;
         }
 
         /* ============================================================
-               全局样式 & CSS 变量
+               CSS 变量 — 亮色 / 深色主题
                ============================================================ */
         :root {
             --primary: #3b6ea5;
@@ -37,14 +50,17 @@
             --radius: 14px;
             --radius-sm: 8px;
             --transition: 0.25s ease;
-            --font: 'BlueArchive', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            --max-width: 820px;   /* 默认宽度，宽屏下会增大 */
+            --font: 'BlueArchive', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            --max-width: 820px;
             --header-height: 64px;
             --tag-bg: #eef3f8;
             --tag-hover: #dce6f0;
+            --progress-bg: #dce6f0;
+            --code-bg: #f4f6f9;
         }
 
-        /* 深色主题 */
+        /* ---------- 深色主题变量 ---------- */
         [data-theme="dark"] {
             --bg: #0f1724;
             --card-bg: #1a2538;
@@ -56,9 +72,11 @@
             --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.5);
             --tag-bg: #1e2d42;
             --tag-hover: #2a3d58;
+            --progress-bg: #2a3a50;
+            --code-bg: #1a2538;
         }
 
-        /* ---------- 宽屏下增大容器宽度 ---------- */
+        /* ---------- 宽屏：增大容器宽度 ---------- */
         @media (min-width: 1200px) {
             :root {
                 --max-width: 1024px;
@@ -70,7 +88,26 @@
             }
         }
 
-        /* ---------- 重置 & 基础 ---------- */
+        /* ---------- 尊重用户动画偏好 ---------- */
+        @media (prefers-reduced-motion: reduce) {
+            :root {
+                --transition: 0s;
+            }
+            html {
+                scroll-behavior: auto;
+            }
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ============================================================
+               重置 & 基础
+               ============================================================ */
         *,
         *::before,
         *::after {
@@ -80,6 +117,8 @@
         }
         html {
             scroll-behavior: smooth;
+            /* 为阅读进度条留出空间 */
+            scroll-padding-top: var(--header-height);
         }
         body {
             font-family: var(--font);
@@ -89,6 +128,8 @@
             transition: background var(--transition), color var(--transition);
             padding-top: var(--header-height);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         a {
             color: var(--primary);
@@ -99,7 +140,7 @@
             color: var(--primary-dark);
         }
 
-        /* ---------- 滚动条 ---------- */
+        /* ---------- 自定义滚动条 ---------- */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -116,7 +157,7 @@
         }
 
         /* ============================================================
-               头部
+               头部导航栏
                ============================================================ */
         .header {
             position: fixed;
@@ -134,10 +175,18 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 28px;
-            transition: background var(--transition), border var(--transition);
+            transition: background var(--transition), border var(--transition),
+                box-shadow var(--transition);
         }
         [data-theme="dark"] .header {
             background-color: rgba(15, 23, 36, 0.88);
+        }
+        /* 滚动时添加阴影 */
+        .header.scrolled {
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="dark"] .header.scrolled {
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
         }
 
         .header-brand {
@@ -148,6 +197,12 @@
             font-size: 1.25rem;
             color: var(--text);
             letter-spacing: -0.3px;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity var(--transition);
+        }
+        .header-brand:hover {
+            opacity: 0.8;
         }
         .header-brand .logo {
             display: inline-flex;
@@ -160,6 +215,7 @@
             border-radius: var(--radius-sm);
             font-size: 1.1rem;
             font-weight: 600;
+            flex-shrink: 0;
         }
         .header-brand span {
             color: var(--text-secondary);
@@ -173,6 +229,7 @@
             gap: 14px;
         }
 
+        /* 主题切换按钮 */
         .theme-toggle {
             background: none;
             border: 1px solid var(--border);
@@ -187,13 +244,19 @@
             color: var(--text-secondary);
             transition: all var(--transition);
             background: var(--card-bg);
+            flex-shrink: 0;
         }
         .theme-toggle:hover {
             border-color: var(--primary);
             color: var(--primary);
             transform: rotate(12deg);
         }
+        .theme-toggle:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
 
+        /* 返回按钮 */
         .header-back {
             display: none;
             align-items: center;
@@ -209,13 +272,34 @@
             transition: all var(--transition);
             background: var(--card-bg);
             font-family: inherit;
+            white-space: nowrap;
         }
         .header-back:hover {
             border-color: var(--primary);
             color: var(--primary);
         }
+        .header-back:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
         .header-back.visible {
             display: inline-flex;
+        }
+
+        /* ============================================================
+               阅读进度条
+               ============================================================ */
+        .reading-progress {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            height: 3px;
+            background: var(--primary);
+            z-index: 101;
+            width: 0%;
+            transition: width 0.15s linear;
+            border-radius: 0 2px 2px 0;
+            pointer-events: none;
         }
 
         /* ============================================================
@@ -225,10 +309,11 @@
             max-width: var(--max-width);
             margin: 0 auto;
             padding: 30px 24px 60px;
+            min-height: calc(100vh - var(--header-height) - 100px);
         }
 
         /* ============================================================
-               首页 - 标签栏 & 布局切换（单按钮）
+               首页 — 标题区
                ============================================================ */
         .page-home .home-header {
             margin-bottom: 16px;
@@ -245,6 +330,9 @@
             margin-top: 4px;
         }
 
+        /* ============================================================
+               标签筛选栏 + 布局切换
+               ============================================================ */
         .tag-filter {
             display: flex;
             flex-wrap: wrap;
@@ -260,6 +348,7 @@
             color: var(--text-muted);
             margin-right: 6px;
             letter-spacing: 0.3px;
+            white-space: nowrap;
         }
         .tag-btn {
             display: inline-flex;
@@ -283,6 +372,10 @@
             border-color: var(--primary-light);
             color: var(--text);
         }
+        .tag-btn:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
         .tag-btn.active {
             background: var(--primary);
             border-color: var(--primary);
@@ -303,7 +396,7 @@
             opacity: 0.9;
         }
 
-        /* ===== 布局切换（单按钮） ===== */
+        /* ----- 布局切换（单按钮） ----- */
         .layout-toggle {
             display: flex;
             align-items: center;
@@ -317,6 +410,7 @@
             color: var(--text-muted);
             font-weight: 500;
             letter-spacing: 0.2px;
+            white-space: nowrap;
         }
         .layout-btn {
             display: inline-flex;
@@ -336,24 +430,25 @@
             user-select: none;
             line-height: 1.6;
             min-height: 32px;
+            white-space: nowrap;
         }
         .layout-btn:hover {
             background: var(--tag-hover);
             border-color: var(--primary-light);
             color: var(--text);
         }
+        .layout-btn:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
         .layout-btn .icon-view {
             display: inline-block;
             font-size: 1rem;
             line-height: 1;
         }
-        /* 当前布局指示 */
-        .layout-btn .layout-status {
-            font-weight: 500;
-        }
 
         /* ============================================================
-               文章列表 ———— 单列 / 双列
+               文章列表 — 单列 / 双列布局
                ============================================================ */
         .post-list {
             display: flex;
@@ -368,6 +463,7 @@
             gap: 18px;
         }
 
+        /* 双列下的卡片微调 */
         .post-list.grid-layout .post-card {
             padding: 18px 20px;
             border-radius: var(--radius-sm);
@@ -391,10 +487,8 @@
             font-size: 0.8rem;
             margin-top: 8px;
         }
-        .post-list.grid-layout .post-card .read-more::after {
-            content: " →";
-        }
 
+        /* 单列下的卡片 */
         .post-list:not(.grid-layout) .post-card {
             padding: 24px 28px;
         }
@@ -407,7 +501,7 @@
         }
 
         /* ============================================================
-               文章卡片 (通用)
+               文章卡片（通用样式）
                ============================================================ */
         .post-card {
             background: var(--card-bg);
@@ -417,6 +511,7 @@
             transition: all var(--transition);
             cursor: pointer;
             position: relative;
+            overflow: hidden;
         }
         .post-card:hover {
             box-shadow: var(--shadow-hover);
@@ -424,6 +519,10 @@
         }
         .post-card:active {
             transform: scale(0.99);
+        }
+        .post-card:focus-within {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
 
         .post-card .meta {
@@ -455,6 +554,7 @@
             cursor: pointer;
             transition: all var(--transition);
             line-height: 1.6;
+            white-space: nowrap;
         }
         .post-card .meta .post-tag:hover {
             background: var(--primary);
@@ -492,6 +592,7 @@
             transition: all var(--transition);
         }
         .post-card .read-more::after {
+            content: " →";
             transition: transform var(--transition);
             display: inline-block;
         }
@@ -499,20 +600,44 @@
             transform: translateX(4px);
         }
 
-        /* 空状态 */
-        .empty-state {
+        /* ============================================================
+               空状态 & 加载 & 错误
+               ============================================================ */
+        .empty-state,
+        .loading-state,
+        .error-state {
             text-align: center;
             padding: 50px 20px;
             color: var(--text-muted);
         }
-        .empty-state .icon {
+        .empty-state .icon,
+        .error-state .icon {
             font-size: 2.6rem;
             margin-bottom: 10px;
         }
-        .empty-state h3 {
+        .empty-state h3,
+        .error-state h2 {
             font-size: 1.2rem;
             color: var(--text-secondary);
             margin-bottom: 4px;
+        }
+        .loading-state .spinner {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-bottom: 14px;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .error-state a {
+            text-decoration: underline;
         }
 
         /* ============================================================
@@ -528,7 +653,7 @@
         }
 
         .post-detail .post-title {
-            font-size: 2.0rem;
+            font-size: 2rem;
             font-weight: 700;
             letter-spacing: -0.5px;
             line-height: 1.25;
@@ -566,6 +691,7 @@
             cursor: pointer;
             transition: all var(--transition);
             line-height: 1.6;
+            white-space: nowrap;
         }
         .post-detail .post-meta .detail-tag:hover {
             background: var(--primary);
@@ -578,6 +704,8 @@
             font-size: 1.05rem;
             line-height: 1.85;
             color: var(--text);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .post-content h1,
         .post-content h2,
@@ -590,6 +718,7 @@
             font-weight: 600;
             line-height: 1.3;
             letter-spacing: -0.3px;
+            scroll-margin-top: calc(var(--header-height) + 20px);
         }
         .post-content h1 {
             font-size: 1.8rem;
@@ -633,16 +762,17 @@
             margin: 0.4em 0;
         }
         .post-content code {
-            font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+            font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Consolas,
+                "Liberation Mono", monospace;
             font-size: 0.9em;
-            background: var(--bg);
+            background: var(--code-bg);
             padding: 0.2em 0.5em;
             border-radius: 4px;
             border: 1px solid var(--border);
             color: var(--text);
         }
         .post-content pre {
-            background: var(--bg);
+            background: var(--code-bg);
             border-radius: var(--radius-sm);
             padding: 16px 20px;
             overflow-x: auto;
@@ -650,6 +780,7 @@
             border: 1px solid var(--border);
             font-size: 0.9rem;
             line-height: 1.6;
+            -webkit-overflow-scrolling: touch;
         }
         .post-content pre code {
             background: transparent;
@@ -664,12 +795,18 @@
             border-radius: var(--radius-sm);
             margin: 1.2em 0;
             border: 1px solid var(--border);
+            /* 图片懒加载占位 */
+            background: var(--bg);
+            min-height: 100px;
         }
         .post-content table {
             width: 100%;
             border-collapse: collapse;
             margin: 1.2em 0;
             font-size: 0.95rem;
+            display: block;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .post-content th,
         .post-content td {
@@ -687,40 +824,50 @@
             margin: 2em 0;
         }
 
-        /* ---------- 加载 & 错误状态 ---------- */
-        .loading-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-        .loading-state .spinner {
-            display: inline-block;
-            width: 36px;
-            height: 36px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin-bottom: 14px;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        /* 代码块复制按钮（可选增强） */
+        .post-content pre {
+            position: relative;
         }
 
-        .error-state {
-            text-align: center;
-            padding: 60px 20px;
+        /* ============================================================
+               回到顶部按钮
+               ============================================================ */
+        .back-to-top {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
             color: var(--text-secondary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 90;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all var(--transition);
         }
-        .error-state .icon {
-            font-size: 2.8rem;
-            margin-bottom: 12px;
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
-        .error-state h2 {
-            font-size: 1.4rem;
-            margin-bottom: 6px;
+        .back-to-top:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-3px);
+        }
+        .back-to-top:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
 
         /* ============================================================
@@ -737,10 +884,41 @@
         }
 
         /* ============================================================
+               打印样式
+               ============================================================ */
+        @media print {
+            .header,
+            .footer,
+            .back-to-top,
+            .reading-progress,
+            .tag-filter,
+            .header-actions {
+                display: none !important;
+            }
+            body {
+                padding-top: 0;
+                background: #fff;
+                color: #000;
+            }
+            .post-detail {
+                box-shadow: none;
+                border: none;
+                padding: 0 !important;
+            }
+            .post-content {
+                font-size: 12pt;
+                line-height: 1.6;
+            }
+            .post-content pre {
+                border: 1px solid #ccc;
+                background: #f9f9f9;
+            }
+        }
+
+        /* ============================================================
                响应式
                ============================================================ */
         @media (max-width: 768px) {
-            /* 平板及以下：双列变单列 */
             .post-list.grid-layout {
                 grid-template-columns: 1fr;
                 gap: 20px;
@@ -761,7 +939,6 @@
             .post-list.grid-layout .post-card .read-more {
                 font-size: 0.88rem;
             }
-            /* 布局切换在窄屏上放在第二行 */
             .layout-toggle {
                 margin-left: 0;
                 padding-left: 0;
@@ -776,6 +953,13 @@
             .layout-btn {
                 font-size: 0.8rem;
                 padding: 4px 14px;
+            }
+            .back-to-top {
+                bottom: 20px;
+                right: 16px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
             }
         }
 
@@ -805,10 +989,10 @@
                 font-size: 1.7rem;
             }
             .post-card {
-                padding: 18px 18px;
+                padding: 18px 18px !important;
             }
             .post-card h2 {
-                font-size: 1.15rem;
+                font-size: 1.15rem !important;
             }
             .post-detail {
                 padding: 24px 18px !important;
@@ -881,7 +1065,7 @@
             display: none !important;
         }
         .fade-in {
-            animation: fadeIn 0.35s ease;
+            animation: fadeIn 0.35s ease both;
         }
         @keyframes fadeIn {
             from {
@@ -893,630 +1077,899 @@
                 transform: translateY(0);
             }
         }
+        /* 针对 prefers-reduced-motion 的动画重置已在根变量处处理 */
     </style>
 </head>
 <body>
 
     <!-- ============================================================
-    头部
+    头部导航栏
     ============================================================ -->
-    <header class="header" role="banner">
-        <div class="header-brand">
-            <span class="logo">🐟</span>
-            Fishing's Blog
-            <span>· Html Version</span>
+    <header class="header" id="header" role="banner" aria-label="网站导航">
+        <div class="header-brand" id="headerBrand" title="返回首页" role="button" tabindex="0"
+        aria-label="Fishing's Blog 首页">
+        <span class="logo" aria-hidden="true">🐟</span>
+        Fishing's Blog
+        <span>· Html</span>
+    </div>
+
+    <div class="header-actions">
+        <button class="header-back" id="backBtn" aria-label="返回文章列表" title="返回列表 (Esc)">
+            ← 返回
+        </button>
+        <button class="theme-toggle" id="themeToggle" aria-label="切换深色/亮色主题" title="切换主题">
+            🌙
+        </button>
+    </div>
+</header>
+
+<!-- ============================================================
+阅读进度条（仅文章详情页显示）
+============================================================ -->
+<div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
+
+<!-- ============================================================
+回到顶部按钮
+============================================================ -->
+<button class="back-to-top" id="backToTop" aria-label="回到页面顶部" title="回到顶部">↑</button>
+
+<!-- ============================================================
+主容器
+============================================================ -->
+<main class="container" id="app" role="main">
+
+    <!-- ===== 首页：文章列表 ===== -->
+    <div id="pageHome" class="page-home">
+        <div class="home-header">
+            <h1>📖 所有文章</h1>
+            <p>用文字记录思考，以代码构建世界</p>
         </div>
-
-        <div class="header-actions">
-            <button class="header-back" id="backBtn" aria-label="返回列表">
-                ← 返回
-            </button>
-            <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
-                🌙
-            </button>
-        </div>
-    </header>
-
-    <!-- ============================================================
-    主容器
-    ============================================================ -->
-    <main class="container" id="app" role="main">
-
-        <!-- ===== 首页 ===== -->
-        <div id="pageHome" class="page-home">
-            <div class="home-header">
-                <h1>📖 所有文章</h1>
-                <p>用文字记录思考，以代码构建世界</p>
-            </div>
-            <!-- 标签筛选栏 + 布局切换 -->
-            <div id="tagFilter" class="tag-filter">
-                <!-- 标签由 JavaScript 动态渲染 -->
-                <!-- 布局切换由 JavaScript 动态渲染 -->
-            </div>
-            <!-- 文章列表 -->
-            <div id="postList" class="post-list">
-                <!-- 由 JavaScript 动态渲染 -->
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <p>加载文章列表...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== 文章详情页 ===== -->
-        <div id="pagePost" class="page-post hidden">
-            <div id="postDetail" class="post-detail">
-                <!-- 由 JavaScript 动态渲染 -->
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <p>加载文章内容...</p>
-                </div>
+        <!-- 标签筛选栏 + 布局切换（由 JS 动态渲染） -->
+        <nav id="tagFilter" class="tag-filter" aria-label="标签筛选"></nav>
+        <!-- 文章列表 -->
+        <div id="postList" class="post-list">
+            <div class="loading-state">
+                <div class="spinner" aria-hidden="true"></div>
+                <p>加载文章列表...</p>
             </div>
         </div>
+    </div>
 
-    </main>
+    <!-- ===== 文章详情页 ===== -->
+    <div id="pagePost" class="page-post hidden">
+        <article id="postDetail" class="post-detail">
+            <div class="loading-state">
+                <div class="spinner" aria-hidden="true"></div>
+                <p>加载文章内容...</p>
+            </div>
+        </article>
+    </div>
 
-    <!-- ============================================================
-    页脚
-    ============================================================ -->
-    <footer class="footer">
-        &copy; 2026 <a href="#">Fishing's Blog</a> · GitHub · Vercel
-    </footer>
+</main>
 
-    <!-- ============================================================
-    JavaScript 主逻辑
-    ============================================================ -->
-    <script>
-        (function() {
-            'use strict';
+<!-- ============================================================
+页脚
+============================================================ -->
+<footer class="footer" role="contentinfo">
+    &copy; <span id="currentYear">2026</span>
+    <a href="#" aria-label="Fishing's Blog 首页">Fishing's Blog</a>
+    · 由 Marked + Highlight.js 驱动
+</footer>
 
-            // ---------- 配置 ----------
-            const CONFIG = {
-                indexUrl: 'index.json',
-                postsDir: 'posts/',
-            };
+<!-- ============================================================
+CDN 脚本：marked + highlight.js
+============================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
+</script>
 
-            // ---------- DOM 引用 ----------
-            const $ = (sel) => document.querySelector(sel);
-            const pageHome = $('#pageHome');
-            const pagePost = $('#pagePost');
-            const tagFilter = $('#tagFilter');
-            const postList = $('#postList');
-            const postDetail = $('#postDetail');
-            const backBtn = $('#backBtn');
-            const themeToggle = $('#themeToggle');
+<!-- ============================================================
+主逻辑脚本
+============================================================ -->
+<script>
+    (function() {
+        'use strict';
 
-            // ---------- 状态 ----------
-            let posts = [];
-            let currentTag = 'all';
-            let currentPostId = null;
-            let isLoading = false;
-            let currentLayout = 'single'; // 'single' | 'double'
+        // ==================== 配置 ====================
+        const CONFIG = {
+            indexUrl: 'index.json',
+            postsDir: 'posts/',
+            fetchTimeout: 10000, // fetch 超时时间（毫秒）
+            scrollThreshold: 350, // 回到顶部按钮显示阈值（像素）
+        };
 
-            // ---------- 主题切换 ----------
-            function getPreferredTheme() {
-                const stored = localStorage.getItem('blog-theme');
-                if (stored) return stored;
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
+        // ==================== DOM 引用缓存 ====================
+        const $ = (sel) => document.querySelector(sel);
+        const pageHome = $('#pageHome');
+        const pagePost = $('#pagePost');
+        const tagFilter = $('#tagFilter');
+        const postList = $('#postList');
+        const postDetail = $('#postDetail');
+        const backBtn = $('#backBtn');
+        const themeToggle = $('#themeToggle');
+        const headerBrand = $('#headerBrand');
+        const header = $('#header');
+        const readingProgress = $('#readingProgress');
+        const backToTop = $('#backToTop');
+        const currentYearSpan = $('#currentYear');
 
-            function setTheme(theme) {
-                const isDark = theme === 'dark';
-                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-                themeToggle.textContent = isDark ? '☀️' : '🌙';
-                localStorage.setItem('blog-theme', theme);
-            }
-            setTheme(getPreferredTheme());
-            themeToggle.addEventListener('click', () => {
-                const current = document.documentElement.getAttribute('data-theme') || 'light';
-                setTheme(current === 'dark' ? 'light' : 'dark');
+        // ==================== 状态管理 ====================
+        let posts = [];
+        let currentTag = 'all';
+        let currentPostId = null;
+        let isLoading = false;
+        let currentLayout = 'single'; // 'single' | 'double'
+
+        // 内存缓存：避免重复 fetch markdown 文件
+        const markdownCache = new Map();
+
+        // 更新页脚年份
+        if (currentYearSpan) {
+            currentYearSpan.textContent = new Date().getFullYear();
+        }
+
+        // ==================== Marked 配置 ====================
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                breaks: true, // GFM 换行支持
+                gfm: true, // GitHub Flavored Markdown
             });
+            // 配置 highlight.js 集成
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                        try {
+                            return hljs.highlight(code, { language: lang }).value;
+                        } catch (e) {
+                            // 降级：返回转义后的纯文本
+                        }
+                    }
+                    // 无语言或 highlight.js 不可用时，返回转义后的代码
+                    return code.replace(/[&<>"']/g, function(m) {
+                        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
+                            "'": '&#039;' };
+                        return map[m];
+                    });
+                },
+            });
+        }
 
-            // ---------- 布局切换（单按钮） ----------
-            function getPreferredLayout() {
-                const stored = localStorage.getItem('blog-layout');
-                if (stored === 'double' || stored === 'single') return stored;
-                return window.innerWidth >= 768 ? 'double' : 'single';
+        // ==================== 带超时的 fetch ====================
+        function fetchWithTimeout(url, timeout = CONFIG.fetchTimeout) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeout);
+            return fetch(url, { signal: controller.signal })
+                .finally(() => clearTimeout(timer));
+        }
+
+        // ==================== 主题切换 ====================
+        function getPreferredTheme() {
+            const stored = localStorage.getItem('blog-theme');
+            if (stored === 'dark' || stored === 'light') return stored;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function setTheme(theme) {
+            const isDark = theme === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+            themeToggle.setAttribute('aria-label', isDark ? '切换亮色主题' : '切换深色主题');
+            localStorage.setItem('blog-theme', theme);
+
+            // 动态切换 highlight.js 主题（如果页面已渲染代码块）
+            if (typeof hljs !== 'undefined') {
+                const existingStyle = document.querySelector('link[data-highlight-theme]');
+                if (existingStyle) {
+                    existingStyle.href = isDark ?
+                        'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css' :
+                        'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+                }
             }
+        }
 
-            function setLayout(layout) {
-                currentLayout = layout;
-                localStorage.setItem('blog-layout', layout);
-                applyLayout(layout);
+        // 初始化主题
+        setTheme(getPreferredTheme());
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // 监听系统主题变化（当用户未手动设置时自动跟随）
+        const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+        systemThemeMedia.addEventListener('change', (e) => {
+            const stored = localStorage.getItem('blog-theme');
+            if (!stored) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        // ==================== 布局切换 ====================
+        function getPreferredLayout() {
+            const stored = localStorage.getItem('blog-layout');
+            if (stored === 'double' || stored === 'single') return stored;
+            return window.innerWidth >= 768 ? 'double' : 'single';
+        }
+
+        function setLayout(layout) {
+            currentLayout = layout;
+            localStorage.setItem('blog-layout', layout);
+            applyLayout(layout);
+            updateLayoutButton();
+        }
+
+        function applyLayout(layout) {
+            if (layout === 'double') {
+                postList.classList.add('grid-layout');
+            } else {
+                postList.classList.remove('grid-layout');
+            }
+        }
+
+        function toggleLayout() {
+            const next = currentLayout === 'single' ? 'double' : 'single';
+            setLayout(next);
+        }
+
+        function updateLayoutButton() {
+            const btn = document.querySelector('.layout-btn');
+            if (!btn) return;
+            const icon = btn.querySelector('.icon-view');
+            const status = btn.querySelector('.layout-status');
+            if (currentLayout === 'single') {
+                if (icon) icon.textContent = '▦';
+                if (status) status.textContent = '单列';
+            } else {
+                if (icon) icon.textContent = '▦▦';
+                if (status) status.textContent = '双列';
+            }
+            btn.setAttribute('aria-label',
+                currentLayout === 'single' ? '当前单列布局，点击切换双列' : '当前双列布局，点击切换单列');
+        }
+
+        // ==================== 渲染：布局切换按钮 ====================
+        function renderLayoutToggle() {
+            let toggleContainer = tagFilter.querySelector('.layout-toggle');
+            if (toggleContainer) {
                 updateLayoutButton();
+                return;
             }
 
-            function applyLayout(layout) {
-                if (layout === 'double') {
-                    postList.classList.add('grid-layout');
-                } else {
-                    postList.classList.remove('grid-layout');
+            toggleContainer = document.createElement('div');
+            toggleContainer.className = 'layout-toggle';
+
+            const label = document.createElement('span');
+            label.className = 'layout-label';
+            label.textContent = '📐 布局';
+            toggleContainer.appendChild(label);
+
+            const btn = document.createElement('button');
+            btn.className = 'layout-btn';
+            btn.title = '切换单列/双列布局';
+            btn.setAttribute('aria-label', '切换布局方式');
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'icon-view';
+            iconSpan.setAttribute('aria-hidden', 'true');
+            const statusSpan = document.createElement('span');
+            statusSpan.className = 'layout-status';
+            btn.appendChild(iconSpan);
+            btn.appendChild(statusSpan);
+            btn.addEventListener('click', toggleLayout);
+            toggleContainer.appendChild(btn);
+
+            tagFilter.appendChild(toggleContainer);
+            updateLayoutButton();
+        }
+
+        // ==================== 路由解析 ====================
+        function getPostIdFromHash() {
+            const hash = window.location.hash.slice(1);
+            if (hash.startsWith('post/')) return hash.slice(5);
+            return null;
+        }
+
+        function getTagFromHash() {
+            const hash = window.location.hash.slice(1);
+            if (hash.startsWith('tag/')) return decodeURIComponent(hash.slice(4));
+            return null;
+        }
+
+        function setHashForTag(tag) {
+            if (tag && tag !== 'all') {
+                window.location.hash = `tag/${encodeURIComponent(tag)}`;
+            } else {
+                // 使用 replaceState 避免产生历史记录
+                history.replaceState(null, '', window.location.pathname);
+            }
+        }
+
+        function setHashForPost(postId) {
+            if (postId) {
+                window.location.hash = `post/${postId}`;
+            } else {
+                history.replaceState(null, '', window.location.pathname);
+            }
+        }
+
+        // ==================== 工具函数 ====================
+        function formatDate(dateStr) {
+            if (!dateStr) return '未知日期';
+            try {
+                // 兼容多种日期格式
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) {
+                    // 尝试解析中文日期或其他格式
+                    const parsed = Date.parse(dateStr);
+                    if (isNaN(parsed)) return dateStr;
+                    const fallback = new Date(parsed);
+                    return `${fallback.getFullYear()}年${String(fallback.getMonth() + 1).padStart(2, '0')}月${String(fallback.getDate()).padStart(2, '0')}日`;
                 }
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}年${m}月${day}日`;
+            } catch {
+                return dateStr;
             }
+        }
 
-            function toggleLayout() {
-                const next = currentLayout === 'single' ? 'double' : 'single';
-                setLayout(next);
-            }
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            };
+            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
 
-            // 更新单个切换按钮的文字和图标
-            function updateLayoutButton() {
-                const btn = document.querySelector('.layout-btn');
-                if (!btn) return;
-                const icon = btn.querySelector('.icon-view');
-                const status = btn.querySelector('.layout-status');
-                if (currentLayout === 'single') {
-                    icon.textContent = '▦';
-                    status.textContent = '单列';
-                } else {
-                    icon.textContent = '▦▦';
-                    status.textContent = '双列';
-                }
-            }
+        /** 防抖函数 */
+        function debounce(fn, delay = 200) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
 
-            // ---------- 渲染：布局切换按钮 ----------
-            function renderLayoutToggle() {
-                let toggleContainer = tagFilter.querySelector('.layout-toggle');
-                if (toggleContainer) {
-                    // 只更新按钮状态，不重建
-                    updateLayoutButton();
-                    return;
-                }
-
-                toggleContainer = document.createElement('div');
-                toggleContainer.className = 'layout-toggle';
-
-                const label = document.createElement('span');
-                label.className = 'layout-label';
-                label.textContent = '📐 布局';
-                toggleContainer.appendChild(label);
-
-                const btn = document.createElement('button');
-                btn.className = 'layout-btn';
-                btn.title = '切换单列/双列布局';
-                // 用两个 span 分别放图标和状态文字
-                const iconSpan = document.createElement('span');
-                iconSpan.className = 'icon-view';
-                const statusSpan = document.createElement('span');
-                statusSpan.className = 'layout-status';
-                btn.appendChild(iconSpan);
-                btn.appendChild(statusSpan);
-                btn.addEventListener('click', toggleLayout);
-                toggleContainer.appendChild(btn);
-
-                tagFilter.appendChild(toggleContainer);
-                // 设置初始状态
-                updateLayoutButton();
-            }
-
-            // ---------- 路由 ----------
-            function getPostIdFromHash() {
-                const hash = window.location.hash.slice(1);
-                if (hash.startsWith('post/')) return hash.slice(5);
-                return null;
-            }
-
-            function getTagFromHash() {
-                const hash = window.location.hash.slice(1);
-                if (hash.startsWith('tag/')) return decodeURIComponent(hash.slice(4));
-                return null;
-            }
-
-            function setHashForTag(tag) {
-                if (tag && tag !== 'all') {
-                    window.location.hash = `tag/${encodeURIComponent(tag)}`;
-                } else {
-                    window.location.hash = '';
-                }
-            }
-
-            function setHashForPost(postId) {
-                if (postId) {
-                    window.location.hash = `post/${postId}`;
-                } else {
-                    window.location.hash = '';
-                }
-            }
-
-            // ---------- 工具函数 ----------
-            function formatDate(dateStr) {
-                if (!dateStr) return '未知日期';
-                try {
-                    const d = new Date(dateStr);
-                    if (isNaN(d.getTime())) return dateStr;
-                    const y = d.getFullYear();
-                    const m = String(d.getMonth() + 1).padStart(2, '0');
-                    const day = String(d.getDate()).padStart(2, '0');
-                    return `${y}年${m}月${day}日`;
-                } catch {
-                    return dateStr;
-                }
-            }
-
-            function escapeHtml(text) {
-                if (!text) return '';
-                const map = {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                };
-                return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
-            }
-
-            // ---------- 获取所有标签及计数 ----------
-            function getAllTags(posts) {
-                const tagMap = new Map();
-                for (const p of posts) {
-                    if (p.tags && Array.isArray(p.tags)) {
-                        for (const t of p.tags) {
-                            const key = String(t).trim();
-                            if (key) {
-                                tagMap.set(key, (tagMap.get(key) || 0) + 1);
-                            }
+        // ==================== 获取所有标签及计数 ====================
+        function getAllTags(postsArr) {
+            const tagMap = new Map();
+            for (const p of postsArr) {
+                if (p.tags && Array.isArray(p.tags)) {
+                    for (const t of p.tags) {
+                        const key = String(t).trim();
+                        if (key) {
+                            tagMap.set(key, (tagMap.get(key) || 0) + 1);
                         }
                     }
                 }
-                const sorted = Array.from(tagMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-                return sorted.map(([name, count]) => ({ name, count }));
             }
+            const sorted = Array.from(tagMap.entries()).sort((a, b) => a[0].localeCompare(b[0], 'zh-Hans-CN'));
+            return sorted.map(([name, count]) => ({ name, count }));
+        }
 
-            // ---------- 筛选文章 ----------
-            function getFilteredPosts(tag) {
-                if (!tag || tag === 'all') return posts;
-                return posts.filter(p => {
-                    if (!p.tags || !Array.isArray(p.tags)) return false;
-                    return p.tags.some(t => String(t).trim() === tag);
-                });
-            }
+        // ==================== 筛选文章 ====================
+        function getFilteredPosts(tag) {
+            if (!tag || tag === 'all') return [...posts];
+            return posts.filter(p => {
+                if (!p.tags || !Array.isArray(p.tags)) return false;
+                return p.tags.some(t => String(t).trim() === tag);
+            });
+        }
 
-            // ---------- 渲染：标签栏 ----------
-            function renderTags(activeTag) {
-                const toggle = tagFilter.querySelector('.layout-toggle');
-                tagFilter.innerHTML = '';
+        // ==================== 渲染：标签栏 ====================
+        function renderTags(activeTag) {
+            // 保存布局切换容器
+            const existingToggle = tagFilter.querySelector('.layout-toggle');
 
-                const allTags = getAllTags(posts);
-                let html = `<span class="tag-label">🏷️ 分类</span>`;
-                const allCount = posts.length;
-                html += `
-                    <button class="tag-btn ${activeTag === 'all' ? 'active' : ''}" data-tag="all">
+            tagFilter.innerHTML = '';
+
+            const allTags = getAllTags(posts);
+            let html = `<span class="tag-label">🏷️ 分类</span>`;
+            const allCount = posts.length;
+            html += `
+                    <button class="tag-btn ${activeTag === 'all' ? 'active' : ''}" data-tag="all" aria-pressed="${activeTag === 'all'}">
                         全部 <span class="count">(${allCount})</span>
                     </button>
                 `;
-                for (const t of allTags) {
-                    const isActive = activeTag === t.name;
-                    html += `
-                        <button class="tag-btn ${isActive ? 'active' : ''}" data-tag="${escapeHtml(t.name)}">
-                            ${escapeHtml(t.name)} <span class="count">(${t.count})</span>
-                        </button>
-                    `;
-                }
-                tagFilter.innerHTML = html;
+            for (const t of allTags) {
+                const isActive = activeTag === t.name;
+                html += `
+                    <button class="tag-btn ${isActive ? 'active' : ''}" data-tag="${escapeHtml(t.name)}" aria-pressed="${isActive}">
+                        ${escapeHtml(t.name)} <span class="count">(${t.count})</span>
+                    </button>
+                `;
+            }
+            tagFilter.innerHTML = html;
 
-                // 重新插入布局切换
+            // 恢复或重建布局切换
+            if (existingToggle) {
+                tagFilter.appendChild(existingToggle);
+                updateLayoutButton();
+            } else {
                 renderLayoutToggle();
-
-                // 绑定标签点击事件
-                tagFilter.querySelectorAll('.tag-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const tag = this.dataset.tag;
-                        if (tag !== currentTag) {
-                            selectTag(tag);
-                        }
-                    });
-                });
             }
 
-            // ---------- 渲染：文章列表 ----------
-            function renderPostList(tag) {
-                const filtered = getFilteredPosts(tag);
-                if (filtered.length === 0) {
-                    const tagDisplay = tag === 'all' ? '全部' : `"${escapeHtml(tag)}"`;
-                    postList.innerHTML = `
+            // 绑定标签点击事件
+            tagFilter.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tag = this.dataset.tag;
+                    if (tag && tag !== currentTag) {
+                        selectTag(tag);
+                    }
+                });
+            });
+        }
+
+        // ==================== 渲染：文章列表 ====================
+        function renderPostList(tag) {
+            const filtered = getFilteredPosts(tag);
+            if (filtered.length === 0) {
+                const tagDisplay = tag === 'all' ? '全部' : `"${escapeHtml(tag)}"`;
+                postList.innerHTML = `
                         <div class="empty-state fade-in">
-                            <div class="icon">🔍</div>
+                            <div class="icon" aria-hidden="true">🔍</div>
                             <h3>没有找到标签为 ${tagDisplay} 的文章</h3>
                             <p style="color:var(--text-muted);font-size:0.95rem;">试试其他标签或查看全部文章</p>
                         </div>
                     `;
-                    return;
-                }
+                return;
+            }
 
-                const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const sorted = [...filtered].sort((a, b) => {
+                const dateA = new Date(a.date || 0);
+                const dateB = new Date(b.date || 0);
+                return dateB - dateA;
+            });
 
-                let html = '';
-                for (const post of sorted) {
-                    const dateStr = formatDate(post.date);
-                    let tagsHtml = '';
-                    if (post.tags && Array.isArray(post.tags)) {
-                        for (const t of post.tags) {
-                            const tName = String(t).trim();
-                            if (tName) {
-                                tagsHtml += `<span class="post-tag" data-tag="${escapeHtml(tName)}">#${escapeHtml(tName)}</span>`;
-                            }
+            let html = '';
+            for (const post of sorted) {
+                const dateStr = formatDate(post.date);
+                let tagsHtml = '';
+                if (post.tags && Array.isArray(post.tags)) {
+                    for (const t of post.tags) {
+                        const tName = String(t).trim();
+                        if (tName) {
+                            tagsHtml +=
+                                `<span class="post-tag" data-tag="${escapeHtml(tName)}" role="button" tabindex="0">#${escapeHtml(tName)}</span>`;
                         }
                     }
-                    const summary = post.summary || '点击阅读全文…';
-                    html += `
-                        <article class="post-card fade-in" data-id="${post.id}">
+                }
+                const summary = post.summary || '点击阅读全文…';
+                html += `
+                        <article class="post-card fade-in" data-id="${escapeHtml(post.id)}" tabindex="0" role="link" aria-label="文章：${escapeHtml(post.title)}">
                             <div class="meta">
                                 <span class="date">📅 ${dateStr}</span>
                                 ${tagsHtml ? `<span class="post-tags">${tagsHtml}</span>` : ''}
                             </div>
-                            <h2><a href="#post/${post.id}">${escapeHtml(post.title)}</a></h2>
+                            <h2><a href="#post/${escapeHtml(post.id)}" tabindex="-1">${escapeHtml(post.title)}</a></h2>
                             <p class="summary">${escapeHtml(summary)}</p>
                             <span class="read-more">阅读全文</span>
                         </article>
                     `;
-                }
-                postList.innerHTML = html;
+            }
+            postList.innerHTML = html;
 
-                // 应用当前布局
-                applyLayout(currentLayout);
+            // 应用当前布局
+            applyLayout(currentLayout);
 
-                // 卡片点击跳转
-                postList.querySelectorAll('.post-card').forEach(card => {
-                    card.addEventListener('click', function(e) {
-                        if (e.target.closest('a') || e.target.closest('.post-tag')) return;
+            // 卡片点击跳转
+            postList.querySelectorAll('.post-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.closest('a') || e.target.closest('.post-tag')) return;
+                    const id = this.dataset.id;
+                    if (id) navigateToPost(id);
+                });
+                // 键盘支持
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (e.target.closest('.post-tag')) return;
                         const id = this.dataset.id;
                         if (id) navigateToPost(id);
-                    });
+                    }
                 });
+            });
 
-                // 卡片内的标签点击筛选
-                postList.querySelectorAll('.post-tag').forEach(el => {
-                    el.addEventListener('click', function(e) {
+            // 卡片内标签点击筛选
+            postList.querySelectorAll('.post-tag').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const tag = this.dataset.tag;
+                    if (tag && tag !== currentTag) {
+                        selectTag(tag);
+                    }
+                });
+                el.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
                         e.stopPropagation();
+                        e.preventDefault();
                         const tag = this.dataset.tag;
                         if (tag && tag !== currentTag) {
                             selectTag(tag);
                         }
-                    });
+                    }
                 });
-            }
+            });
+        }
 
-            // ---------- 渲染：首页 ----------
-            function renderHome(tag) {
-                pageHome.classList.remove('hidden');
-                pagePost.classList.add('hidden');
-                backBtn.classList.remove('visible');
+        // ==================== 渲染：首页 ====================
+        function renderHome(tag) {
+            pageHome.classList.remove('hidden');
+            pagePost.classList.add('hidden');
+            backBtn.classList.remove('visible');
+            readingProgress.style.width = '0%';
 
-                currentTag = tag || 'all';
-                renderTags(currentTag);
-                renderPostList(currentTag);
-                setHashForTag(currentTag);
-            }
+            currentTag = tag || 'all';
+            renderTags(currentTag);
+            renderPostList(currentTag);
+            setHashForTag(currentTag);
 
-            // ---------- 渲染：文章详情 ----------
-            async function renderPost(postId) {
-                const meta = posts.find(p => p.id === postId);
-                if (!meta) {
-                    postDetail.innerHTML = `
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==================== 渲染：文章详情 ====================
+        async function renderPost(postId) {
+            const meta = posts.find(p => p.id === postId);
+            if (!meta) {
+                postDetail.innerHTML = `
                         <div class="error-state">
-                            <div class="icon">🔍</div>
+                            <div class="icon" aria-hidden="true">🔍</div>
                             <h2>文章未找到</h2>
                             <p>ID: "${escapeHtml(postId)}" 不存在</p>
                             <p style="margin-top:12px;"><a href="#/" style="text-decoration:underline;">返回首页</a></p>
                         </div>
                     `;
-                    pageHome.classList.add('hidden');
-                    pagePost.classList.remove('hidden');
-                    backBtn.classList.add('visible');
-                    return;
-                }
-
-                postDetail.innerHTML = `
-                    <div class="loading-state">
-                        <div class="spinner"></div>
-                        <p>加载文章内容...</p>
-                    </div>
-                `;
                 pageHome.classList.add('hidden');
                 pagePost.classList.remove('hidden');
                 backBtn.classList.add('visible');
+                readingProgress.style.width = '0%';
+                return;
+            }
 
-                try {
-                    const mdUrl = `${CONFIG.postsDir}${meta.filename}`;
-                    const response = await fetch(mdUrl);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const mdText = await response.text();
-                    const htmlContent = marked.parse(mdText);
+            // 显示加载状态
+            postDetail.innerHTML = `
+                    <div class="loading-state">
+                        <div class="spinner" aria-hidden="true"></div>
+                        <p>加载文章内容...</p>
+                    </div>
+                `;
+            pageHome.classList.add('hidden');
+            pagePost.classList.remove('hidden');
+            backBtn.classList.add('visible');
+            readingProgress.style.width = '0%';
 
-                    const dateStr = formatDate(meta.date);
-                    let detailTagsHtml = '';
-                    if (meta.tags && Array.isArray(meta.tags)) {
-                        for (const t of meta.tags) {
-                            const tName = String(t).trim();
-                            if (tName) {
-                                detailTagsHtml += `<span class="detail-tag" data-tag="${escapeHtml(tName)}">#${escapeHtml(tName)}</span>`;
-                            }
+            try {
+                const mdUrl = `${CONFIG.postsDir}${meta.filename}`;
+
+                // 检查缓存
+                let mdText;
+                if (markdownCache.has(mdUrl)) {
+                    mdText = markdownCache.get(mdUrl);
+                } else {
+                    const response = await fetchWithTimeout(mdUrl);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    mdText = await response.text();
+                    // 存入缓存（限制缓存大小，防止内存溢出）
+                    if (markdownCache.size > 50) {
+                        const firstKey = markdownCache.keys().next().value;
+                        markdownCache.delete(firstKey);
+                    }
+                    markdownCache.set(mdUrl, mdText);
+                }
+
+                // 渲染 Markdown
+                const htmlContent = typeof marked !== 'undefined' ?
+                    marked.parse(mdText) :
+                    `<pre>${escapeHtml(mdText)}</pre>`;
+
+                const dateStr = formatDate(meta.date);
+                let detailTagsHtml = '';
+                if (meta.tags && Array.isArray(meta.tags)) {
+                    for (const t of meta.tags) {
+                        const tName = String(t).trim();
+                        if (tName) {
+                            detailTagsHtml +=
+                                `<span class="detail-tag" data-tag="${escapeHtml(tName)}" role="button" tabindex="0">#${escapeHtml(tName)}</span>`;
                         }
                     }
+                }
 
-                    postDetail.innerHTML = `
+                postDetail.innerHTML = `
                         <h1 class="post-title">${escapeHtml(meta.title)}</h1>
                         <div class="post-meta">
                             <span class="date">📅 ${dateStr}</span>
                             ${detailTagsHtml ? `<span class="detail-tags">${detailTagsHtml}</span>` : ''}
-                            <span>📄 ${escapeHtml(meta.filename)}</span>
+                            <span title="文件名">📄 ${escapeHtml(meta.filename)}</span>
                         </div>
                         <div class="post-content fade-in">
                             ${htmlContent}
                         </div>
                     `;
 
-                    if (typeof hljs !== 'undefined') {
-                        document.querySelectorAll('.post-content pre code').forEach(block => {
-                            hljs.highlightElement(block);
-                        });
-                    }
-
-                    postDetail.querySelectorAll('.detail-tag').forEach(el => {
-                        el.addEventListener('click', function() {
-                            const tag = this.dataset.tag;
-                            if (tag) {
-                                selectTag(tag);
-                            }
-                        });
+                // 代码高亮
+                if (typeof hljs !== 'undefined') {
+                    document.querySelectorAll('.post-content pre code').forEach(block => {
+                        hljs.highlightElement(block);
                     });
+                }
 
-                    currentPostId = postId;
-                    setHashForPost(postId);
+                // 图片懒加载
+                document.querySelectorAll('.post-content img').forEach(img => {
+                    if (!img.loading) {
+                        img.loading = 'lazy';
+                    }
+                    if (!img.alt) {
+                        img.alt = '文章配图';
+                    }
+                });
 
-                } catch (err) {
-                    console.error('加载文章失败:', err);
-                    postDetail.innerHTML = `
+                // 为外部链接添加 rel 属性
+                document.querySelectorAll('.post-content a[href^="http"]').forEach(link => {
+                    if (!link.rel.includes('noopener')) {
+                        link.rel = 'noopener noreferrer';
+                        link.target = '_blank';
+                    }
+                });
+
+                // 标签点击事件
+                postDetail.querySelectorAll('.detail-tag').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const tag = this.dataset.tag;
+                        if (tag) selectTag(tag);
+                    });
+                    el.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            const tag = this.dataset.tag;
+                            if (tag) selectTag(tag);
+                        }
+                    });
+                });
+
+                currentPostId = postId;
+                setHashForPost(postId);
+
+                // 滚动到顶部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (err) {
+                console.error('加载文章失败:', err);
+                postDetail.innerHTML = `
                         <div class="error-state">
-                            <div class="icon">⚠️</div>
+                            <div class="icon" aria-hidden="true">⚠️</div>
                             <h2>加载失败</h2>
                             <p>无法读取文章内容，请检查网络或文件路径。</p>
                             <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);">${escapeHtml(err.message)}</p>
                             <p style="margin-top:12px;"><a href="#/" style="text-decoration:underline;">返回首页</a></p>
                         </div>
                     `;
-                }
             }
+        }
 
-            // ---------- 导航 ----------
-            function navigateToPost(postId) {
-                if (isLoading) return;
-                isLoading = true;
-                renderPost(postId).finally(() => { isLoading = false; });
-            }
-
-            function navigateHome(tag) {
-                if (isLoading) return;
-                isLoading = true;
-                const effectiveTag = tag || currentTag || 'all';
-                renderHome(effectiveTag);
+        // ==================== 导航 ====================
+        function navigateToPost(postId) {
+            if (isLoading) return;
+            isLoading = true;
+            renderPost(postId).finally(() => {
                 isLoading = false;
-            }
-
-            function selectTag(tag) {
-                if (isLoading) return;
-                if (tag === currentTag && !pageHome.classList.contains('hidden')) return;
-                if (!pageHome.classList.contains('hidden')) {
-                    renderHome(tag);
-                } else {
-                    navigateHome(tag);
-                }
-            }
-
-            // ---------- 路由处理 ----------
-            function handleRoute() {
-                const postId = getPostIdFromHash();
-                if (postId) {
-                    if (posts.length === 0) {
-                        loadIndex().then(() => { navigateToPost(postId); });
-                    } else {
-                        navigateToPost(postId);
-                    }
-                    return;
-                }
-
-                const tag = getTagFromHash();
-                if (tag) {
-                    if (posts.length === 0) {
-                        loadIndex().then(() => { renderHome(tag); });
-                    } else {
-                        renderHome(tag);
-                    }
-                    return;
-                }
-
-                if (posts.length === 0) {
-                    loadIndex().then(() => { renderHome('all'); });
-                } else {
-                    renderHome('all');
-                }
-            }
-
-            // ---------- 加载文章索引 ----------
-            async function loadIndex() {
-                try {
-                    const response = await fetch(CONFIG.indexUrl);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const data = await response.json();
-                    if (!Array.isArray(data)) throw new Error('索引格式错误：应为数组');
-                    posts = data.filter(item => item.id && item.title && item.filename);
-                    return posts;
-                } catch (err) {
-                    console.error('加载索引失败:', err);
-                    posts = [];
-                    postList.innerHTML = `
-                        <div class="error-state">
-                            <div class="icon">📂</div>
-                            <h2>加载索引失败</h2>
-                            <p>无法读取 <code>index.json</code>，请确保文件存在且格式正确。</p>
-                            <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);">${escapeHtml(err.message)}</p>
-                        </div>
-                    `;
-                    throw err;
-                }
-            }
-
-            // ---------- 返回按钮 ----------
-            backBtn.addEventListener('click', function() {
-                if (!pageHome.classList.contains('hidden')) return;
-                navigateHome('all');
             });
+        }
 
-            // ---------- 监听路由变化 ----------
-            window.addEventListener('hashchange', handleRoute);
-
-            // ---------- 窗口大小变化时自动调整布局 ----------
-            let resizeTimer = null;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
-                    const stored = localStorage.getItem('blog-layout');
-                    if (!stored) {
-                        const preferred = window.innerWidth >= 768 ? 'double' : 'single';
-                        if (preferred !== currentLayout) {
-                            setLayout(preferred);
-                        }
-                    }
-                }, 300);
+        function navigateHome(tag) {
+            if (isLoading) return;
+            isLoading = true;
+            const effectiveTag = tag || currentTag || 'all';
+            renderHome(effectiveTag);
+            // 使用 requestAnimationFrame 确保 DOM 更新后再解除锁定
+            requestAnimationFrame(() => {
+                isLoading = false;
             });
+        }
 
-            // ---------- 初始化 ----------
-            async function init() {
-                try {
-                    await loadIndex();
-                    const preferredLayout = getPreferredLayout();
-                    currentLayout = preferredLayout;
-                    handleRoute();
-                    setTimeout(() => {
-                        applyLayout(currentLayout);
-                        renderLayoutToggle();
-                    }, 50);
-                } catch (err) {
-                    handleRoute();
-                }
-            }
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
+        function selectTag(tag) {
+            if (isLoading) return;
+            if (tag === currentTag && !pageHome.classList.contains('hidden')) return;
+            if (!pageHome.classList.contains('hidden')) {
+                renderHome(tag);
             } else {
-                init();
+                navigateHome(tag);
+            }
+        }
+
+        // ==================== 路由处理 ====================
+        function handleRoute() {
+            const postId = getPostIdFromHash();
+            if (postId) {
+                if (posts.length === 0) {
+                    loadIndex().then(() => navigateToPost(postId)).catch(() => {});
+                } else {
+                    navigateToPost(postId);
+                }
+                return;
             }
 
-            // 暴露方便调试
-            window.__blog = {
-                posts,
-                currentTag,
-                currentLayout,
-                selectTag,
-                navigateHome,
-                navigateToPost,
-                setLayout,
-                toggleLayout,
-                reload: init
-            };
+            const tag = getTagFromHash();
+            const effectiveTag = tag || 'all';
+            if (posts.length === 0) {
+                loadIndex().then(() => renderHome(effectiveTag)).catch(() => {});
+            } else {
+                renderHome(effectiveTag);
+            }
+        }
 
-        })();
-    </script>
+        // ==================== 加载文章索引 ====================
+        async function loadIndex() {
+            try {
+                const response = await fetchWithTimeout(CONFIG.indexUrl);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const data = await response.json();
+                if (!Array.isArray(data)) throw new Error('索引格式错误：应为数组');
+                posts = data.filter(item => item.id && item.title && item.filename);
+                return posts;
+            } catch (err) {
+                console.error('加载索引失败:', err);
+                posts = [];
+                if (postList && postList.querySelector('.loading-state')) {
+                    postList.innerHTML = `
+                            <div class="error-state">
+                                <div class="icon" aria-hidden="true">📂</div>
+                                <h2>加载索引失败</h2>
+                                <p>无法读取 <code>index.json</code>，请确保文件存在且格式正确。</p>
+                                <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);">${escapeHtml(err.message)}</p>
+                            </div>
+                        `;
+                }
+                throw err;
+            }
+        }
 
+        // ==================== 事件：返回按钮 ====================
+        backBtn.addEventListener('click', function() {
+            if (!pageHome.classList.contains('hidden')) return;
+            navigateHome('all');
+        });
+
+        // ==================== 事件：点击品牌名返回首页 ====================
+        headerBrand.addEventListener('click', function() {
+            if (!pageHome.classList.contains('hidden') && currentTag === 'all') return;
+            navigateHome('all');
+        });
+        headerBrand.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                navigateHome('all');
+            }
+        });
+
+        // ==================== 事件：键盘快捷键 ====================
+        document.addEventListener('keydown', function(e) {
+            // Esc 键返回首页
+            if (e.key === 'Escape' && !pageHome.classList.contains('hidden') === false) {
+                if (!pagePost.classList.contains('hidden')) {
+                    navigateHome('all');
+                }
+            }
+        });
+
+        // ==================== 事件：路由变化 ====================
+        window.addEventListener('hashchange', handleRoute);
+
+        // ==================== 滚动事件：进度条 + 回到顶部 + 头部阴影 ====================
+        const handleScroll = debounce(function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            // 阅读进度条（仅在文章详情页更新）
+            if (!pagePost.classList.contains('hidden')) {
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                if (docHeight > 0) {
+                    const progress = Math.min((scrollTop / docHeight) * 100, 100);
+                    readingProgress.style.width = progress + '%';
+                }
+            }
+
+            // 回到顶部按钮
+            if (scrollTop > CONFIG.scrollThreshold) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+
+            // 头部阴影
+            if (scrollTop > 10) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }, 50);
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // ==================== 事件：回到顶部按钮 ====================
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ==================== 事件：窗口大小变化（自动调整布局） ====================
+        const handleResize = debounce(function() {
+            const stored = localStorage.getItem('blog-layout');
+            if (!stored) {
+                const preferred = window.innerWidth >= 768 ? 'double' : 'single';
+                if (preferred !== currentLayout && pageHome && !pageHome.classList.contains('hidden')) {
+                    setLayout(preferred);
+                }
+            }
+        }, 300);
+
+        window.addEventListener('resize', handleResize);
+
+        // ==================== 动态加载 highlight.js 深色主题 ====================
+        function ensureHighlightTheme() {
+            if (!document.querySelector('link[data-highlight-theme]')) {
+                const isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.setAttribute('data-highlight-theme', '');
+                link.href = isDark ?
+                    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css' :
+                    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+                document.head.appendChild(link);
+            }
+        }
+
+        // ==================== 初始化 ====================
+        async function init() {
+            try {
+                await loadIndex();
+                const preferredLayout = getPreferredLayout();
+                currentLayout = preferredLayout;
+                ensureHighlightTheme();
+                handleRoute();
+                // 确保布局在 DOM 渲染后应用
+                requestAnimationFrame(() => {
+                    applyLayout(currentLayout);
+                    renderLayoutToggle();
+                });
+            } catch (err) {
+                // 即使加载失败也尝试处理路由
+                ensureHighlightTheme();
+                handleRoute();
+                requestAnimationFrame(() => {
+                    applyLayout(currentLayout);
+                    renderLayoutToggle();
+                });
+            }
+        }
+
+        // DOM 就绪后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        // ==================== 暴露调试接口 ====================
+        window.__blog = {
+            posts,
+            get currentTag() { return currentTag; },
+            get currentLayout() { return currentLayout; },
+            get currentPostId() { return currentPostId; },
+            selectTag,
+            navigateHome,
+            navigateToPost,
+            setLayout,
+            toggleLayout,
+            clearCache: () => markdownCache.clear(),
+            reload: init,
+        };
+
+    })();
+</script>
 </body>
 </html>
