@@ -8,39 +8,29 @@
     <meta name="theme-color" content="#3b6ea5" />
     <title>Fishing's Blog</title>
 
-    <!-- ===== Favicon ===== -->
     <link rel="icon" href="assets/icons/favicon.ico" />
-
-    <!-- ===== highlight.js：代码高亮主题 ===== -->
     <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
     media="screen" />
     <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
     media="screen and (prefers-color-scheme: dark)" />
-
-    <!-- ===== 预加载关键资源 ===== -->
     <link rel="preload" href="assets/fonts/font.ttf" as="font" type="font/ttf" crossorigin />
 
     <style>
-        /* ============================================================
-               @font-face — 自定义字体（BlueArchive 风格）
-               ============================================================ */
         @font-face {
             font-family: 'BlueArchive';
             src: url('assets/fonts/font.ttf') format('truetype');
             font-display: swap;
         }
 
-        /* ============================================================
-               CSS 变量 — 亮色 / 深色主题
-               ============================================================ */
         :root {
             --primary: #3b6ea5;
             --primary-light: #5a8cc9;
             --primary-dark: #2a4f7a;
             --bg: #f6f9fc;
             --card-bg: #ffffff;
+            --card-bg-rgb: 255, 255, 255;
             --text: #1e2a3a;
             --text-secondary: #4a5a6e;
             --text-muted: #8a9aa8;
@@ -58,16 +48,14 @@
             --tag-hover: #dce6f0;
             --progress-bg: #dce6f0;
             --code-bg: #f4f6f9;
-
-            /* 背景控制变量 */
             --bg-opacity: 1;
             --bg-blur: 0px;
         }
 
-        /* ---------- 深色主题变量 ---------- */
         [data-theme="dark"] {
             --bg: #0f1724;
             --card-bg: #1a2538;
+            --card-bg-rgb: 26, 37, 56;
             --text: #e8edf4;
             --text-secondary: #b0c0d4;
             --text-muted: #6a7e96;
@@ -80,58 +68,19 @@
             --code-bg: #1a2538;
         }
 
-        /* ---------- 宽屏：增大容器宽度 ---------- */
-        @media (min-width: 1200px) {
-            :root {
-                --max-width: 1024px;
-            }
-        }
-        @media (min-width: 1600px) {
-            :root {
-                --max-width: 1200px;
-            }
-        }
+        @media (min-width: 1200px) { :root { --max-width: 1024px; } }
+        @media (min-width: 1600px) { :root { --max-width: 1200px; } }
 
-        /* ---------- 尊重用户动画偏好 ---------- */
         @media (prefers-reduced-motion: reduce) {
-            :root {
-                --transition: 0s;
-            }
-            html {
-                scroll-behavior: auto;
-            }
-            *,
-            *::before,
-            *::after {
+            :root { --transition: 0s; }
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
                 animation-duration: 0.01ms !important;
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
             }
         }
 
-        /* ============================================================
-               背景层
-               ============================================================ */
-        #bg-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: var(--bg-opacity);
-            filter: blur(var(--bg-blur));
-            transition: opacity 0.3s ease, filter 0.3s ease;
-            pointer-events: none;
-            will-change: opacity, filter;
-        }
-
-        /* ============================================================
-               重置 & 基础
-               ============================================================ */
         *,
         *::before,
         *::after {
@@ -160,57 +109,53 @@
             text-decoration: none;
             transition: color var(--transition);
         }
-        a:hover {
-            color: var(--primary-dark);
-        }
+        a:hover { color: var(--primary-dark); }
 
-        /* ---------- 自定义滚动条 ---------- */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-light);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* ============================================================
-               头部导航栏
-               ============================================================ */
-        .header {
+        /* 背景层 */
+        #bg-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--header-height);
-            background: var(--card-bg);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: var(--bg-opacity);
+            filter: blur(var(--bg-blur));
+            transition: opacity 0.3s ease, filter 0.3s ease;
+            pointer-events: none;
+        }
+
+        /* 组件半透明：卡片、标签、布局按钮、菜单、详情页等 */
+        .post-card,
+        .tag-btn,
+        .layout-btn,
+        .menu-panel,
+        .post-detail,
+        .header {
+            background-color: rgba(var(--card-bg-rgb), var(--bg-opacity));
+            backdrop-filter: blur(calc(var(--bg-blur) * 0.6));
+            -webkit-backdrop-filter: blur(calc(var(--bg-blur) * 0.6));
+        }
+        /* 保留原有背景色用于回退，但不再使用 solid 颜色 */
+        .post-card,
+        .tag-btn,
+        .layout-btn,
+        .post-detail {
+            border: 1px solid var(--border);
+        }
+        /* 头部与菜单面板保持自身样式，添加半透明 */
+        .header {
+            background-color: rgba(var(--card-bg-rgb), var(--bg-opacity));
             border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            background-color: rgba(255, 255, 255, 0.40);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 28px;
-            transition: background var(--transition), border var(--transition),
-                box-shadow var(--transition);
         }
-        [data-theme="dark"] .header {
-            background-color: rgba(15, 23, 36, 0.40);
-        }
-        .header.scrolled {
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
-        }
-        [data-theme="dark"] .header.scrolled {
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
-        }
+        .header.scrolled { box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+        [data-theme="dark"] .header.scrolled { box-shadow: 0 2px 16px rgba(0,0,0,0.3); }
 
         .header-brand {
             display: flex;
@@ -222,17 +167,13 @@
             letter-spacing: -0.3px;
             cursor: pointer;
             user-select: none;
-            transition: opacity var(--transition);
         }
-        .header-brand:hover {
-            opacity: 0.8;
-        }
+        .header-brand:hover { opacity: 0.8; }
         .header-brand .logo {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
+            width: 34px; height: 34px;
             background: var(--primary);
             color: #fff;
             border-radius: var(--radius-sm);
@@ -251,8 +192,6 @@
             align-items: center;
             gap: 14px;
         }
-
-        /* 返回按钮 */
         .header-back {
             display: none;
             align-items: center;
@@ -266,29 +205,18 @@
             border-radius: 20px;
             border: 1px solid var(--border);
             transition: all var(--transition);
-            background: var(--card-bg);
+            background: rgba(var(--card-bg-rgb), 0.4);
             font-family: inherit;
             white-space: nowrap;
         }
-        .header-back:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-        .header-back:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-        .header-back.visible {
-            display: inline-flex;
-        }
+        .header-back:hover { border-color: var(--primary); color: var(--primary); }
+        .header-back.visible { display: inline-flex; }
 
-        /* 菜单按钮 */
         .menu-btn {
             background: none;
             border: 1px solid var(--border);
             border-radius: 50%;
-            width: 38px;
-            height: 38px;
+            width: 38px; height: 38px;
             font-size: 1.2rem;
             cursor: pointer;
             display: flex;
@@ -296,29 +224,21 @@
             justify-content: center;
             color: var(--text-secondary);
             transition: all var(--transition);
-            background: var(--card-bg);
+            background: rgba(var(--card-bg-rgb), 0.4);
             flex-shrink: 0;
             position: relative;
         }
-        .menu-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-        .menu-btn:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
+        .menu-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-        /* ============================================================
-               下拉菜单面板
-               ============================================================ */
         .menu-panel {
             position: fixed;
             top: var(--header-height);
             right: 20px;
             width: 320px;
             max-width: calc(100vw - 40px);
-            background: var(--card-bg);
+            background: rgba(var(--card-bg-rgb), 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             box-shadow: var(--shadow-hover);
@@ -328,24 +248,15 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            background-color: rgba(255, 255, 255, 0.85);
-        }
-        [data-theme="dark"] .menu-panel {
-            background-color: rgba(26, 37, 56, 0.85);
         }
         .menu-panel.open {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
-        .menu-section {
-            margin-bottom: 20px;
-        }
-        .menu-section:last-child {
-            margin-bottom: 0;
-        }
+
+        .menu-section { margin-bottom: 20px; }
+        .menu-section:last-child { margin-bottom: 0; }
         .menu-section-title {
             font-size: 0.8rem;
             font-weight: 600;
@@ -361,11 +272,10 @@
             gap: 10px;
             margin-bottom: 12px;
         }
-        .menu-row:last-child {
-            margin-bottom: 0;
-        }
+        .menu-row:last-child { margin-bottom: 0; }
         .menu-btn-action {
-            background: var(--tag-bg);
+            background: rgba(var(--card-bg-rgb), 0.6);
+            backdrop-filter: blur(4px);
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 6px 16px;
@@ -389,9 +299,13 @@
             color: #fff;
             border-color: var(--primary);
         }
-        .menu-btn-action.primary:hover {
-            background: var(--primary-dark);
+        .file-upload-label { cursor: pointer; }
+        #customBgInput { display: none; }
+        .menu-divider {
+            border-top: 1px solid var(--border);
+            margin: 14px 0;
         }
+
         input[type="range"] {
             width: 100%;
             cursor: pointer;
@@ -403,20 +317,7 @@
             min-width: 35px;
             text-align: right;
         }
-        .file-upload-label {
-            cursor: pointer;
-        }
-        #customBgInput {
-            display: none;
-        }
-        .menu-divider {
-            border-top: 1px solid var(--border);
-            margin: 14px 0;
-        }
 
-        /* ============================================================
-               阅读进度条
-               ============================================================ */
         .reading-progress {
             position: fixed;
             top: var(--header-height);
@@ -430,9 +331,6 @@
             pointer-events: none;
         }
 
-        /* ============================================================
-               主容器
-               ============================================================ */
         .container {
             max-width: var(--max-width);
             margin: 0 auto;
@@ -442,25 +340,10 @@
             z-index: 1;
         }
 
-        /* ============================================================
-               首页 — 标题区
-               ============================================================ */
-        .page-home .home-header {
-            margin-bottom: 16px;
-        }
-        .page-home .home-header h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
-        }
-        .page-home .home-header p {
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-            margin-top: 4px;
-        }
+        .page-home .home-header { margin-bottom: 16px; }
+        .page-home .home-header h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.5px; }
+        .page-home .home-header p { color: var(--text-secondary); font-size: 1.05rem; margin-top: 4px; }
 
-        /* 标签筛选栏 + 布局切换 */
         .tag-filter {
             display: flex;
             flex-wrap: wrap;
@@ -484,9 +367,6 @@
             gap: 4px;
             padding: 5px 16px;
             border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--tag-bg);
-            color: var(--text-secondary);
             font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
@@ -495,36 +375,15 @@
             white-space: nowrap;
             user-select: none;
         }
-        .tag-btn:hover {
-            background: var(--tag-hover);
-            border-color: var(--primary-light);
-            color: var(--text);
-        }
-        .tag-btn:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
         .tag-btn.active {
             background: var(--primary);
             border-color: var(--primary);
             color: #fff;
-            box-shadow: 0 2px 8px rgba(59, 110, 165, 0.25);
+            box-shadow: 0 2px 8px rgba(59,110,165,0.25);
         }
-        .tag-btn.active:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
-        }
-        .tag-btn .count {
-            font-size: 0.7rem;
-            opacity: 0.7;
-            font-weight: 400;
-            margin-left: 2px;
-        }
-        .tag-btn.active .count {
-            opacity: 0.9;
-        }
+        .tag-btn .count { font-size: 0.7rem; opacity: 0.7; margin-left: 2px; }
+        .tag-btn.active .count { opacity: 0.9; }
 
-        /* 布局切换 */
         .layout-toggle {
             display: flex;
             align-items: center;
@@ -547,9 +406,6 @@
             gap: 6px;
             padding: 4px 16px;
             border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--tag-bg);
-            color: var(--text-secondary);
             font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
@@ -560,22 +416,8 @@
             min-height: 32px;
             white-space: nowrap;
         }
-        .layout-btn:hover {
-            background: var(--tag-hover);
-            border-color: var(--primary-light);
-            color: var(--text);
-        }
-        .layout-btn:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-        .layout-btn .icon-view {
-            display: inline-block;
-            font-size: 1rem;
-            line-height: 1;
-        }
+        .layout-btn .icon-view { display: inline-block; font-size: 1rem; line-height: 1; }
 
-        /* 文章列表 */
         .post-list {
             display: flex;
             flex-direction: column;
@@ -587,58 +429,26 @@
             grid-template-columns: 1fr 1fr;
             gap: 18px;
         }
-        .post-list.grid-layout .post-card {
-            padding: 18px 20px;
-            border-radius: var(--radius-sm);
-        }
-        .post-list.grid-layout .post-card h2 {
-            font-size: 1.1rem;
-        }
-        .post-list.grid-layout .post-card .summary {
-            font-size: 0.85rem;
-            -webkit-line-clamp: 2;
-        }
-        .post-list.grid-layout .post-card .meta {
-            font-size: 0.72rem;
-            gap: 4px 10px;
-        }
-        .post-list.grid-layout .post-card .meta .post-tag {
-            font-size: 0.6rem;
-            padding: 1px 8px;
-        }
-        .post-list.grid-layout .post-card .read-more {
-            font-size: 0.8rem;
-            margin-top: 8px;
-        }
-        .post-list:not(.grid-layout) .post-card {
-            padding: 24px 28px;
-        }
-        .post-list:not(.grid-layout) .post-card h2 {
-            font-size: 1.35rem;
-        }
-        .post-list:not(.grid-layout) .post-card .summary {
-            font-size: 0.95rem;
-            -webkit-line-clamp: 2;
-        }
+        .post-list.grid-layout .post-card { padding: 18px 20px; border-radius: var(--radius-sm); }
+        .post-list.grid-layout .post-card h2 { font-size: 1.1rem; }
+        .post-list.grid-layout .post-card .summary { font-size: 0.85rem; -webkit-line-clamp: 2; }
+        .post-list.grid-layout .post-card .meta { font-size: 0.72rem; gap: 4px 10px; }
+        .post-list.grid-layout .post-card .meta .post-tag { font-size: 0.6rem; padding: 1px 8px; }
+        .post-list.grid-layout .post-card .read-more { font-size: 0.8rem; margin-top: 8px; }
+        .post-list:not(.grid-layout) .post-card { padding: 24px 28px; }
+        .post-list:not(.grid-layout) .post-card h2 { font-size: 1.35rem; }
+        .post-list:not(.grid-layout) .post-card .summary { font-size: 0.95rem; -webkit-line-clamp: 2; }
 
-        /* 文章卡片 */
         .post-card {
-            background: var(--card-bg);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
             transition: all var(--transition);
             cursor: pointer;
             position: relative;
             overflow: hidden;
         }
-        .post-card:hover {
-            box-shadow: var(--shadow-hover);
-            transform: translateY(-2px);
-        }
-        .post-card:active {
-            transform: scale(0.99);
-        }
+        .post-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+        .post-card:active { transform: scale(0.99); }
         .post-card .meta {
             display: flex;
             flex-wrap: wrap;
@@ -648,18 +458,11 @@
             color: var(--text-muted);
             margin-bottom: 8px;
         }
-        .post-card .meta .date {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .post-card .meta .post-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px 6px;
-        }
+        .post-card .meta .date { display: flex; align-items: center; gap: 4px; }
+        .post-card .meta .post-tags { display: flex; flex-wrap: wrap; gap: 4px 6px; }
         .post-card .meta .post-tag {
-            background: var(--tag-bg);
+            background: rgba(var(--card-bg-rgb), 0.4);
+            backdrop-filter: blur(2px);
             padding: 1px 10px;
             border-radius: 12px;
             font-size: 0.7rem;
@@ -675,90 +478,32 @@
             border-color: var(--primary);
             color: #fff;
         }
-        .post-card h2 {
-            font-weight: 600;
-            letter-spacing: -0.3px;
-            line-height: 1.4;
-            margin-bottom: 6px;
-            color: var(--text);
-        }
-        .post-card h2 a {
-            color: inherit;
-        }
-        .post-card h2 a:hover {
-            color: var(--primary);
-        }
-        .post-card .summary {
-            color: var(--text-secondary);
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-        .post-card .read-more {
-            display: inline-block;
-            margin-top: 12px;
-            font-weight: 500;
-            color: var(--primary);
-            transition: all var(--transition);
-        }
-        .post-card .read-more::after {
-            content: " →";
-            transition: transform var(--transition);
-            display: inline-block;
-        }
-        .post-card:hover .read-more::after {
-            transform: translateX(4px);
-        }
+        .post-card h2 { font-weight: 600; letter-spacing: -0.3px; line-height: 1.4; margin-bottom: 6px; color: var(--text); }
+        .post-card h2 a { color: inherit; }
+        .post-card h2 a:hover { color: var(--primary); }
+        .post-card .summary { color: var(--text-secondary); display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; margin-top: 4px; }
+        .post-card .read-more { display: inline-block; margin-top: 12px; font-weight: 500; color: var(--primary); transition: all var(--transition); }
+        .post-card .read-more::after { content: " →"; transition: transform var(--transition); display: inline-block; }
+        .post-card:hover .read-more::after { transform: translateX(4px); }
 
-        /* 空状态 & 加载 */
-        .empty-state,
-        .loading-state,
-        .error-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state .icon,
-        .error-state .icon {
-            font-size: 2.6rem;
-            margin-bottom: 10px;
-        }
-        .empty-state h3,
-        .error-state h2 {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
+        .empty-state, .loading-state, .error-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
         .loading-state .spinner {
             display: inline-block;
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             border: 3px solid var(--border);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
             margin-bottom: 14px;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* 文章详情 */
         .page-post .post-detail {
-            background: var(--card-bg);
             border-radius: var(--radius);
             padding: 40px 44px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
         }
-        .post-detail .post-title {
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            line-height: 1.25;
-            margin-bottom: 8px;
-        }
+        .post-detail .post-title { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 8px; }
         .post-detail .post-meta {
             display: flex;
             flex-wrap: wrap;
@@ -770,20 +515,8 @@
             padding-bottom: 18px;
             margin-bottom: 28px;
         }
-        .post-content {
-            font-size: 1.05rem;
-            line-height: 1.85;
-            color: var(--text);
-            word-wrap: break-word;
-        }
-        /* 省略部分 markdown 样式，保留之前结构 */
-        .post-content h1, .post-content h2, .post-content h3,
-        .post-content h4, .post-content h5, .post-content h6 {
-            margin-top: 1.8em;
-            margin-bottom: 0.5em;
-            font-weight: 600;
-            line-height: 1.3;
-        }
+        .post-content { font-size: 1.05rem; line-height: 1.85; color: var(--text); word-wrap: break-word; }
+        .post-content h1, .post-content h2, .post-content h3 { margin-top: 1.8em; margin-bottom: 0.5em; font-weight: 600; line-height: 1.3; }
         .post-content pre {
             background: var(--code-bg);
             border-radius: var(--radius-sm);
@@ -792,27 +525,16 @@
             margin: 1.2em 0;
             border: 1px solid var(--border);
         }
-        .post-content code {
-            font-family: monospace;
-            font-size: 0.9em;
-            background: var(--code-bg);
-            padding: 0.2em 0.5em;
-            border-radius: 4px;
-        }
-        .post-content img {
-            max-width: 100%;
-            border-radius: var(--radius-sm);
-        }
+        .post-content code { font-family: monospace; font-size: 0.9em; background: var(--code-bg); padding: 0.2em 0.5em; border-radius: 4px; }
+        .post-content img { max-width: 100%; border-radius: var(--radius-sm); }
 
-        /* 回到顶部 */
         .back-to-top {
             position: fixed;
-            bottom: 32px;
-            right: 32px;
-            width: 44px;
-            height: 44px;
+            bottom: 32px; right: 32px;
+            width: 44px; height: 44px;
             border-radius: 50%;
-            background: var(--card-bg);
+            background: rgba(var(--card-bg-rgb), 0.6);
+            backdrop-filter: blur(4px);
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             color: var(--text-secondary);
@@ -833,7 +555,6 @@
             pointer-events: auto;
         }
 
-        /* 页脚 */
         .footer {
             max-width: var(--max-width);
             margin: 40px auto 0;
@@ -844,18 +565,9 @@
             border-top: 1px solid var(--border);
         }
 
-        /* 响应式 */
         @media (max-width: 768px) {
-            .post-list.grid-layout {
-                grid-template-columns: 1fr;
-            }
-            .layout-toggle {
-                display: none;
-            }
-            .menu-panel {
-                width: calc(100vw - 40px);
-                right: 20px;
-            }
+            .post-list.grid-layout { grid-template-columns: 1fr; }
+            .layout-toggle { display: none; }
         }
         @media (max-width: 640px) {
             :root { --header-height: 58px; }
@@ -873,10 +585,8 @@
 </head>
 <body>
 
-    <!-- 背景层 -->
     <div id="bg-layer"></div>
 
-    <!-- 头部 -->
     <header class="header" id="header">
         <div class="header-brand" id="headerBrand" title="返回首页" role="button" tabindex="0">
             <span class="logo" aria-hidden="true">🐟</span>
@@ -885,32 +595,33 @@
         </div>
         <div class="header-actions">
             <button class="header-back" id="backBtn" aria-label="返回列表">← 返回</button>
-            <button class="menu-btn" id="menuBtn" aria-label="打开设置菜单" title="设置">⚙️</button>
+            <button class="menu-btn" id="menuBtn" aria-label="打开设置菜单" title="设置">☰</button>
         </div>
     </header>
 
-    <!-- 设置菜单面板 -->
     <div class="menu-panel" id="menuPanel">
         <div class="menu-section">
-            <div class="menu-section-title">🎨 主题</div>
-            <button class="menu-btn-action" id="themeToggleMenu" style="width:100%">🌙 深色模式</button>
+            <div class="menu-row" style="margin-bottom:0;">
+                <span class="menu-section-title" style="margin-bottom:0;">主题</span>
+                <button class="menu-btn-action" id="themeToggleMenu">🌙 深色模式</button>
+            </div>
         </div>
         <div class="menu-divider"></div>
         <div class="menu-section">
-            <div class="menu-section-title">🖼️ 背景图片</div>
+            <div class="menu-section-title">背景图片</div>
             <div class="menu-row">
-                <button class="menu-btn-action" id="bgNoneBtn">🚫 无背景</button>
-                <button class="menu-btn-action" id="bgRandomBtn">🎲 随机背景</button>
+                <button class="menu-btn-action" id="bgNoneBtn">无背景</button>
+                <button class="menu-btn-action" id="bgRandomBtn">随机背景</button>
             </div>
             <div class="menu-row">
-                <label class="menu-btn-action file-upload-label" for="customBgInput">📁 上传图片</label>
+                <label class="menu-btn-action file-upload-label" for="customBgInput">上传图片</label>
                 <input type="file" id="customBgInput" accept="image/*">
-                <button class="menu-btn-action" id="bgDownloadBtn" disabled>⬇️ 下载</button>
+                <button class="menu-btn-action" id="bgDownloadBtn" disabled>下载</button>
             </div>
         </div>
         <div class="menu-divider"></div>
         <div class="menu-section">
-            <div class="menu-section-title">🔧 背景调整</div>
+            <div class="menu-section-title">背景调整</div>
             <div class="menu-row">
                 <span style="font-size:0.85rem;">透明度</span>
                 <input type="range" id="bgOpacitySlider" min="0" max="1" step="0.05" value="1">
@@ -924,7 +635,6 @@
         </div>
     </div>
 
-    <!-- 阅读进度条 -->
     <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
     <button class="back-to-top" id="backToTop" aria-label="回到顶部">↑</button>
 
@@ -964,7 +674,6 @@
             randomBgApi: 'https://img.catcdn.cn/ba/'
         };
 
-        // DOM 元素
         const $ = (sel) => document.querySelector(sel);
         const pageHome = $('#pageHome');
         const pagePost = $('#pagePost');
@@ -990,7 +699,6 @@
         const opacityValue = $('#opacityValue');
         const blurValue = $('#blurValue');
 
-        // 状态
         let posts = [];
         let currentTag = 'all';
         let currentPostId = null;
@@ -1000,7 +708,6 @@
 
         if (currentYearSpan) currentYearSpan.textContent = new Date().getFullYear();
 
-        // ---------- Marked 配置 ----------
         if (typeof marked !== 'undefined') {
             marked.setOptions({ breaks: true, gfm: true });
             marked.setOptions({
@@ -1013,18 +720,38 @@
             });
         }
 
-        // ---------- 工具函数 ----------
         function fetchWithTimeout(url, timeout = CONFIG.fetchTimeout) {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeout);
             return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
         }
 
-        function formatDate(d) { /* 保留原逻辑 */ if(!d)return'未知日期';try{const t=new Date(d);if(isNaN(t.getTime())){const p=Date.parse(d);if(isNaN(p))return d;const f=new Date(p);return`${f.getFullYear()}年${String(f.getMonth()+1).padStart(2,'0')}月${String(f.getDate()).padStart(2,'0')}日`}return`${t.getFullYear()}年${String(t.getMonth()+1).padStart(2,'0')}月${String(t.getDate()).padStart(2,'0')}日`}catch{return d} }
-        function escapeHtml(s) { if(!s)return'';const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};return String(s).replace(/[&<>"']/g,c=>m[c]); }
-        function debounce(fn, delay=200) { let t; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a),delay) } }
+        function formatDate(d) {
+            if(!d) return '未知日期';
+            try {
+                const t = new Date(d);
+                if(isNaN(t.getTime())) {
+                    const p = Date.parse(d);
+                    if(isNaN(p)) return d;
+                    const f = new Date(p);
+                    return `${f.getFullYear()}年${String(f.getMonth()+1).padStart(2,'0')}月${String(f.getDate()).padStart(2,'0')}日`;
+                }
+                return `${t.getFullYear()}年${String(t.getMonth()+1).padStart(2,'0')}月${String(t.getDate()).padStart(2,'0')}日`;
+            } catch { return d; }
+        }
 
-        // ---------- 主题管理 ----------
+        function escapeHtml(s) {
+            if(!s) return '';
+            const m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};
+            return String(s).replace(/[&<>"']/g, c => m[c]);
+        }
+
+        function debounce(fn, delay=200) {
+            let t;
+            return function(...a) { clearTimeout(t); t = setTimeout(() => fn.apply(this, a), delay); };
+        }
+
+        // 主题管理
         function getPreferredTheme() {
             const stored = localStorage.getItem('blog-theme');
             if (stored === 'dark' || stored === 'light') return stored;
@@ -1047,96 +774,103 @@
             const current = document.documentElement.getAttribute('data-theme') || 'light';
             setTheme(current === 'dark' ? 'light' : 'dark');
         });
-        const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
-        systemThemeMedia.addEventListener('change', e => {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             if (!localStorage.getItem('blog-theme')) setTheme(e.matches ? 'dark' : 'light');
         });
 
-        // ---------- 背景管理 ----------
+        // 背景管理
         function getBgSettings() {
             const defaults = { type: 'none', customData: '', opacity: 1, blur: 0 };
             try {
-                const saved = JSON.parse(localStorage.getItem('bg-settings'));
-                return { ...defaults, ...saved };
+                return { ...defaults, ...JSON.parse(localStorage.getItem('bg-settings')) };
             } catch { return defaults; }
         }
-        function saveBgSettings(settings) {
-            localStorage.setItem('bg-settings', JSON.stringify(settings));
-        }
+        function saveBgSettings(s) { localStorage.setItem('bg-settings', JSON.stringify(s)); }
         function applyBgSettings() {
-            const settings = getBgSettings();
-            // 更新 CSS 变量
-            document.documentElement.style.setProperty('--bg-opacity', settings.opacity);
-            document.documentElement.style.setProperty('--bg-blur', settings.blur + 'px');
-            // 更新滑块
-            bgOpacitySlider.value = settings.opacity;
-            bgBlurSlider.value = settings.blur;
-            opacityValue.textContent = settings.opacity;
-            blurValue.textContent = settings.blur + 'px';
-            // 设置背景图片
-            if (settings.type === 'none') {
+            const s = getBgSettings();
+            document.documentElement.style.setProperty('--bg-opacity', s.opacity);
+            document.documentElement.style.setProperty('--bg-blur', s.blur + 'px');
+            bgOpacitySlider.value = s.opacity;
+            bgBlurSlider.value = s.blur;
+            opacityValue.textContent = s.opacity;
+            blurValue.textContent = s.blur + 'px';
+
+            if (s.type === 'none') {
                 bgLayer.style.backgroundImage = 'none';
                 bgDownloadBtn.disabled = true;
-            } else if (settings.type === 'random') {
+            } else if (s.type === 'random') {
                 const url = CONFIG.randomBgApi + '?t=' + Date.now();
                 bgLayer.style.backgroundImage = `url(${url})`;
                 bgDownloadBtn.disabled = false;
-            } else if (settings.type === 'custom' && settings.customData) {
-                bgLayer.style.backgroundImage = `url(${settings.customData})`;
+            } else if (s.type === 'custom' && s.customData) {
+                bgLayer.style.backgroundImage = `url(${s.customData})`;
                 bgDownloadBtn.disabled = false;
             } else {
                 bgLayer.style.backgroundImage = 'none';
                 bgDownloadBtn.disabled = true;
             }
         }
+
         function setBgNone() {
-            const settings = getBgSettings();
-            settings.type = 'none';
-            settings.customData = '';
-            saveBgSettings(settings);
-            applyBgSettings();
+            const s = getBgSettings(); s.type = 'none'; s.customData = '';
+            saveBgSettings(s); applyBgSettings();
         }
         function setBgRandom() {
-            const settings = getBgSettings();
-            settings.type = 'random';
-            settings.customData = '';
-            saveBgSettings(settings);
-            applyBgSettings();
+            const s = getBgSettings(); s.type = 'random'; s.customData = '';
+            saveBgSettings(s); applyBgSettings();
         }
         function setBgCustom(dataUrl) {
-            const settings = getBgSettings();
-            settings.type = 'custom';
-            settings.customData = dataUrl;
-            saveBgSettings(settings);
-            applyBgSettings();
-        }
-        function downloadCurrentBg() {
-            const settings = getBgSettings();
-            let url = '';
-            if (settings.type === 'random') {
-                url = bgLayer.style.backgroundImage.replace(/url\(["']?/, '').replace(/["']?\)/, '');
-            } else if (settings.type === 'custom' && settings.customData) {
-                url = settings.customData;
-            }
-            if (!url) return;
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'background-' + Date.now() + '.jpg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const s = getBgSettings(); s.type = 'custom'; s.customData = dataUrl;
+            saveBgSettings(s); applyBgSettings();
         }
 
-        // 绑定背景按钮
+        // 下载当前背景（修复跨域跳转问题）
+        async function downloadCurrentBg() {
+            const s = getBgSettings();
+            let url = '';
+            if (s.type === 'random') {
+                url = bgLayer.style.backgroundImage.replace(/url\(["']?/, '').replace(/["']?\)/, '');
+            } else if (s.type === 'custom' && s.customData) {
+                url = s.customData;
+            }
+            if (!url) return;
+
+            try {
+                // 使用 canvas 转换，避免跨域限制
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = url;
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                });
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = 'background-' + Date.now() + '.jpg';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+                }, 'image/jpeg', 0.95);
+            } catch (e) {
+                alert('下载失败，可能是跨域限制。请尝试右键保存图片。');
+            }
+        }
+
         bgNoneBtn.addEventListener('click', setBgNone);
         bgRandomBtn.addEventListener('click', setBgRandom);
         customBgInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(ev) {
-                setBgCustom(ev.target.result);
-            };
+            reader.onload = ev => setBgCustom(ev.target.result);
             reader.readAsDataURL(file);
         });
         bgDownloadBtn.addEventListener('click', downloadCurrentBg);
@@ -1144,23 +878,18 @@
             const val = parseFloat(this.value);
             document.documentElement.style.setProperty('--bg-opacity', val);
             opacityValue.textContent = val;
-            const settings = getBgSettings();
-            settings.opacity = val;
-            saveBgSettings(settings);
+            const s = getBgSettings(); s.opacity = val; saveBgSettings(s);
         });
         bgBlurSlider.addEventListener('input', function() {
             const val = parseInt(this.value, 10);
             document.documentElement.style.setProperty('--bg-blur', val + 'px');
             blurValue.textContent = val + 'px';
-            const settings = getBgSettings();
-            settings.blur = val;
-            saveBgSettings(settings);
+            const s = getBgSettings(); s.blur = val; saveBgSettings(s);
         });
 
-        // 初始化背景
         applyBgSettings();
 
-        // ---------- 菜单开关 ----------
+        // 菜单开关
         function toggleMenu(force) {
             const isOpen = menuPanel.classList.contains('open');
             const newState = typeof force === 'boolean' ? force : !isOpen;
@@ -1172,23 +901,18 @@
                 menuBtn.setAttribute('aria-expanded', 'false');
             }
         }
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu();
+        menuBtn.addEventListener('click', e => { e.stopPropagation(); toggleMenu(); });
+        document.addEventListener('click', e => {
+            if (!menuPanel.contains(e.target) && e.target !== menuBtn) toggleMenu(false);
         });
-        document.addEventListener('click', function(e) {
-            if (!menuPanel.contains(e.target) && e.target !== menuBtn) {
-                toggleMenu(false);
-            }
-        });
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', e => {
             if (e.key === 'Escape' && menuPanel.classList.contains('open')) {
                 toggleMenu(false);
                 menuBtn.focus();
             }
         });
 
-        // ---------- 布局切换 ----------
+        // 布局
         function getPreferredLayout() {
             const stored = localStorage.getItem('blog-layout');
             if (stored === 'double' || stored === 'single') return stored;
@@ -1200,9 +924,8 @@
             applyLayout(layout);
             updateLayoutButton();
         }
-        function applyLayout(layout) {
-            if (layout === 'double') postList.classList.add('grid-layout');
-            else postList.classList.remove('grid-layout');
+        function applyLayout(l) {
+            postList.classList.toggle('grid-layout', l === 'double');
         }
         function toggleLayout() { setLayout(currentLayout === 'single' ? 'double' : 'single'); }
         function updateLayoutButton() {
@@ -1232,50 +955,186 @@
             updateLayoutButton();
         }
 
-        // ---------- 路由及文章加载（保留核心逻辑，省略重复代码，使用前文完整版） ----------
+        // 路由
         function getPostIdFromHash() { const h=window.location.hash.slice(1); return h.startsWith('post/')?h.slice(5):null; }
         function getTagFromHash() { const h=window.location.hash.slice(1); return h.startsWith('tag/')?decodeURIComponent(h.slice(4)):null; }
         function setHashForTag(tag) { if(tag&&tag!=='all') window.location.hash='tag/'+encodeURIComponent(tag); else history.replaceState(null,'',window.location.pathname); }
         function setHashForPost(id) { if(id) window.location.hash='post/'+id; else history.replaceState(null,'',window.location.pathname); }
-        function getAllTags(postsArr) { const m=new Map(); postsArr.forEach(p=>{ if(p.tags) p.tags.forEach(t=>{ const k=String(t).trim(); if(k) m.set(k,(m.get(k)||0)+1) }) }); return Array.from(m.entries()).sort((a,b)=>a[0].localeCompare(b[0],'zh-Hans-CN')).map(([n,c])=>({name:n,count:c})); }
+        function getAllTags(arr) { const m=new Map(); arr.forEach(p=>{ if(p.tags) p.tags.forEach(t=>{ const k=String(t).trim(); if(k) m.set(k,(m.get(k)||0)+1) }) }); return Array.from(m.entries()).sort((a,b)=>a[0].localeCompare(b[0],'zh-Hans-CN')).map(([n,c])=>({name:n,count:c})); }
         function getFilteredPosts(tag) { if(!tag||tag==='all') return [...posts]; return posts.filter(p=>p.tags&&p.tags.some(t=>String(t).trim()===tag)); }
-        async function loadIndex() { /* 同前 */ try{const r=await fetchWithTimeout(CONFIG.indexUrl);if(!r.ok)throw new Error(`HTTP ${r.status}`);const d=await r.json();if(!Array.isArray(d))throw new Error('格式错误');posts=d.filter(i=>i.id&&i.title&&i.filename);}catch(e){console.error(e);posts=[];postList.innerHTML=`<div class="error-state"><div class="icon">📂</div><h2>加载索引失败</h2><p>${escapeHtml(e.message)}</p></div>`;throw e} }
 
-        function renderTags(activeTag) { /* 同前，保留布局切换 */ const existingToggle=tagFilter.querySelector('.layout-toggle'); tagFilter.innerHTML=''; const allTags=getAllTags(posts); let html=`<span class="tag-label">🏷️ 分类</span><button class="tag-btn ${activeTag==='all'?'active':''}" data-tag="all">全部 <span class="count">(${posts.length})</span></button>`; allTags.forEach(t=>{ html+=`<button class="tag-btn ${activeTag===t.name?'active':''}" data-tag="${escapeHtml(t.name)}">${escapeHtml(t.name)} <span class="count">(${t.count})</span></button>` }); tagFilter.innerHTML=html; if(existingToggle) { tagFilter.appendChild(existingToggle); updateLayoutButton(); } else renderLayoutToggle(); tagFilter.querySelectorAll('.tag-btn').forEach(b=>b.addEventListener('click',function(){ const tag=this.dataset.tag; if(tag&&tag!==currentTag) selectTag(tag) })) }
-        function renderPostList(tag) { const filtered=getFilteredPosts(tag); if(!filtered.length){ postList.innerHTML=`<div class="empty-state fade-in"><div class="icon">🔍</div><h3>没有找到标签为 ${tag==='all'?'全部':'"'+escapeHtml(tag)+'"'} 的文章</h3></div>`; return } const sorted=[...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date)); let html=''; sorted.forEach(p=>{ const tagsHtml=p.tags?p.tags.map(t=>`<span class="post-tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</span>`).join(''):''; html+=`<article class="post-card fade-in" data-id="${p.id}"><div class="meta"><span class="date">📅 ${formatDate(p.date)}</span>${tagsHtml?`<span class="post-tags">${tagsHtml}</span>`:''}</div><h2><a href="#post/${p.id}">${escapeHtml(p.title)}</a></h2><p class="summary">${escapeHtml(p.summary||'点击阅读全文…')}</p><span class="read-more">阅读全文</span></article>` }); postList.innerHTML=html; applyLayout(currentLayout); postList.querySelectorAll('.post-card').forEach(c=>{ c.addEventListener('click',function(e){ if(e.target.closest('a')||e.target.closest('.post-tag'))return; navigateToPost(this.dataset.id) }) }); postList.querySelectorAll('.post-tag').forEach(el=>{ el.addEventListener('click',function(e){ e.stopPropagation(); const t=this.dataset.tag; if(t&&t!==currentTag) selectTag(t) }) }) }
-        function renderHome(tag) { pageHome.classList.remove('hidden'); pagePost.classList.add('hidden'); backBtn.classList.remove('visible'); readingProgress.style.width='0%'; currentTag=tag||'all'; renderTags(currentTag); renderPostList(currentTag); setHashForTag(currentTag); window.scrollTo({top:0,behavior:'smooth'}) }
-        async function renderPost(postId) { /* 同前，省略细节，保持原有逻辑 */ /* 此处需完整复制原先 renderPost 函数，因长度限制简述，实际部署请使用完整版 */ }
-        function navigateToPost(postId) { if(isLoading)return; isLoading=true; renderPost(postId).finally(()=>{isLoading=false}) }
-        function navigateHome(tag) { if(isLoading)return; isLoading=true; const t=tag||currentTag||'all'; renderHome(t); requestAnimationFrame(()=>{isLoading=false}) }
-        function selectTag(tag) { if(isLoading)return; if(tag===currentTag&&!pageHome.classList.contains('hidden'))return; if(!pageHome.classList.contains('hidden')) renderHome(tag); else navigateHome(tag) }
-        function handleRoute() { const pid=getPostIdFromHash(); if(pid){ if(!posts.length) loadIndex().then(()=>navigateToPost(pid)).catch(()=>{}); else navigateToPost(pid); return } const t=getTagFromHash()||'all'; if(!posts.length) loadIndex().then(()=>renderHome(t)).catch(()=>{}); else renderHome(t) }
+        async function loadIndex() {
+            try {
+                const r = await fetchWithTimeout(CONFIG.indexUrl);
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const d = await r.json();
+                if (!Array.isArray(d)) throw new Error('格式错误');
+                posts = d.filter(i => i.id && i.title && i.filename);
+            } catch(e) {
+                console.error(e);
+                posts = [];
+                postList.innerHTML = `<div class="error-state"><div class="icon">📂</div><h2>加载索引失败</h2><p>${escapeHtml(e.message)}</p></div>`;
+                throw e;
+            }
+        }
 
-        // 事件绑定
-        backBtn.addEventListener('click', ()=>{ if(!pageHome.classList.contains('hidden'))return; navigateHome('all') });
-        headerBrand.addEventListener('click', ()=>{ if(!pageHome.classList.contains('hidden')&&currentTag==='all')return; navigateHome('all') });
+        function renderTags(activeTag) {
+            const existingToggle = tagFilter.querySelector('.layout-toggle');
+            tagFilter.innerHTML = '';
+            const allTags = getAllTags(posts);
+            let html = `<span class="tag-label">🏷️ 分类</span><button class="tag-btn ${activeTag==='all'?'active':''}" data-tag="all">全部 <span class="count">(${posts.length})</span></button>`;
+            allTags.forEach(t => {
+                html += `<button class="tag-btn ${activeTag===t.name?'active':''}" data-tag="${escapeHtml(t.name)}">${escapeHtml(t.name)} <span class="count">(${t.count})</span></button>`;
+            });
+            tagFilter.innerHTML = html;
+            if (existingToggle) { tagFilter.appendChild(existingToggle); updateLayoutButton(); }
+            else renderLayoutToggle();
+            tagFilter.querySelectorAll('.tag-btn').forEach(b => b.addEventListener('click', function() {
+                const tag = this.dataset.tag;
+                if (tag && tag !== currentTag) selectTag(tag);
+            }));
+        }
+
+        function renderPostList(tag) {
+            const filtered = getFilteredPosts(tag);
+            if (!filtered.length) {
+                postList.innerHTML = `<div class="empty-state fade-in"><div class="icon">🔍</div><h3>没有找到标签为 ${tag==='all'?'全部':'"'+escapeHtml(tag)+'"'} 的文章</h3></div>`;
+                return;
+            }
+            const sorted = [...filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
+            let html = '';
+            sorted.forEach(p => {
+                const tagsHtml = p.tags ? p.tags.map(t => `<span class="post-tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</span>`).join('') : '';
+                html += `<article class="post-card fade-in" data-id="${p.id}">
+                    <div class="meta"><span class="date">📅 ${formatDate(p.date)}</span>${tagsHtml ? `<span class="post-tags">${tagsHtml}</span>` : ''}</div>
+                    <h2><a href="#post/${p.id}">${escapeHtml(p.title)}</a></h2>
+                    <p class="summary">${escapeHtml(p.summary || '点击阅读全文…')}</p>
+                    <span class="read-more">阅读全文</span>
+                </article>`;
+            });
+            postList.innerHTML = html;
+            applyLayout(currentLayout);
+            postList.querySelectorAll('.post-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.closest('a') || e.target.closest('.post-tag')) return;
+                    navigateToPost(this.dataset.id);
+                });
+            });
+            postList.querySelectorAll('.post-tag').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const t = this.dataset.tag;
+                    if (t && t !== currentTag) selectTag(t);
+                });
+            });
+        }
+
+        function renderHome(tag) {
+            pageHome.classList.remove('hidden');
+            pagePost.classList.add('hidden');
+            backBtn.classList.remove('visible');
+            readingProgress.style.width = '0%';
+            currentTag = tag || 'all';
+            renderTags(currentTag);
+            renderPostList(currentTag);
+            setHashForTag(currentTag);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function renderPost(postId) {
+            const meta = posts.find(p => p.id === postId);
+            if (!meta) {
+                postDetail.innerHTML = `<div class="error-state"><div class="icon">🔍</div><h2>文章未找到</h2><p>ID: "${escapeHtml(postId)}" 不存在</p></div>`;
+                pageHome.classList.add('hidden');
+                pagePost.classList.remove('hidden');
+                backBtn.classList.add('visible');
+                return;
+            }
+            postDetail.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>加载文章内容...</p></div>`;
+            pageHome.classList.add('hidden');
+            pagePost.classList.remove('hidden');
+            backBtn.classList.add('visible');
+            try {
+                const mdUrl = `${CONFIG.postsDir}${meta.filename}`;
+                let mdText;
+                if (markdownCache.has(mdUrl)) mdText = markdownCache.get(mdUrl);
+                else {
+                    const resp = await fetchWithTimeout(mdUrl);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    mdText = await resp.text();
+                    if (markdownCache.size > 50) markdownCache.delete(markdownCache.keys().next().value);
+                    markdownCache.set(mdUrl, mdText);
+                }
+                const htmlContent = typeof marked !== 'undefined' ? marked.parse(mdText) : `<pre>${escapeHtml(mdText)}</pre>`;
+                postDetail.innerHTML = `
+                    <h1 class="post-title">${escapeHtml(meta.title)}</h1>
+                    <div class="post-meta">
+                        <span>📅 ${formatDate(meta.date)}</span>
+                        ${meta.tags ? meta.tags.map(t => `<span class="detail-tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</span>`).join('') : ''}
+                    </div>
+                    <div class="post-content fade-in">${htmlContent}</div>
+                `;
+                if (typeof hljs !== 'undefined') document.querySelectorAll('.post-content pre code').forEach(b => hljs.highlightElement(b));
+                document.querySelectorAll('.post-content img').forEach(img => { img.loading = 'lazy'; });
+                postDetail.querySelectorAll('.detail-tag').forEach(el => {
+                    el.addEventListener('click', () => selectTag(el.dataset.tag));
+                });
+                currentPostId = postId;
+                setHashForPost(postId);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (err) {
+                postDetail.innerHTML = `<div class="error-state"><div class="icon">⚠️</div><h2>加载失败</h2><p>${escapeHtml(err.message)}</p></div>`;
+            }
+        }
+
+        function navigateToPost(postId) { if(isLoading) return; isLoading = true; renderPost(postId).finally(() => isLoading = false); }
+        function navigateHome(tag) { if(isLoading) return; isLoading = true; const t = tag || currentTag || 'all'; renderHome(t); requestAnimationFrame(() => isLoading = false); }
+        function selectTag(tag) { if(isLoading) return; if(tag === currentTag && !pageHome.classList.contains('hidden')) return; if(!pageHome.classList.contains('hidden')) renderHome(tag); else navigateHome(tag); }
+        function handleRoute() {
+            const pid = getPostIdFromHash();
+            if (pid) { if(!posts.length) loadIndex().then(()=>navigateToPost(pid)).catch(()=>{}); else navigateToPost(pid); return; }
+            const t = getTagFromHash() || 'all';
+            if(!posts.length) loadIndex().then(()=>renderHome(t)).catch(()=>{}); else renderHome(t);
+        }
+
+        backBtn.addEventListener('click', () => { if(!pageHome.classList.contains('hidden')) return; navigateHome('all'); });
+        headerBrand.addEventListener('click', () => { if(!pageHome.classList.contains('hidden') && currentTag==='all') return; navigateHome('all'); });
         window.addEventListener('hashchange', handleRoute);
-        const handleScroll = debounce(()=>{ const st=window.pageYOffset||document.documentElement.scrollTop; if(!pagePost.classList.contains('hidden')){ const dh=document.documentElement.scrollHeight-window.innerHeight; if(dh>0) readingProgress.style.width=Math.min((st/dh)*100,100)+'%' } backToTop.classList.toggle('visible', st>CONFIG.scrollThreshold); header.classList.toggle('scrolled', st>10) },50);
-        window.addEventListener('scroll', handleScroll, {passive:true});
-        backToTop.addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
-        window.addEventListener('resize', debounce(()=>{ if(!localStorage.getItem('blog-layout')){ const pref=window.innerWidth>=768?'double':'single'; if(pref!==currentLayout&&!pageHome.classList.contains('hidden')) setLayout(pref) } },300));
+        const handleScroll = debounce(() => {
+            const st = window.pageYOffset;
+            if(!pagePost.classList.contains('hidden')) {
+                const dh = document.documentElement.scrollHeight - window.innerHeight;
+                if(dh > 0) readingProgress.style.width = Math.min((st/dh)*100, 100) + '%';
+            }
+            backToTop.classList.toggle('visible', st > CONFIG.scrollThreshold);
+            header.classList.toggle('scrolled', st > 10);
+        }, 50);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        window.addEventListener('resize', debounce(() => {
+            if(!localStorage.getItem('blog-layout')) {
+                const pref = window.innerWidth >= 768 ? 'double' : 'single';
+                if(pref !== currentLayout && !pageHome.classList.contains('hidden')) setLayout(pref);
+            }
+        }, 300));
 
-        // 初始化
         async function init() {
             try { await loadIndex(); } catch(e){}
-            const preferredLayout = getPreferredLayout();
-            currentLayout = preferredLayout;
+            const prefLayout = getPreferredLayout();
+            currentLayout = prefLayout;
             applyLayout(currentLayout);
             handleRoute();
-            requestAnimationFrame(()=>{ applyLayout(currentLayout); renderLayoutToggle(); });
+            requestAnimationFrame(() => { applyLayout(currentLayout); renderLayoutToggle(); });
             if (!document.querySelector('link[data-highlight-theme]')) {
                 const link = document.createElement('link'); link.rel='stylesheet'; link.setAttribute('data-highlight-theme','');
                 link.href = (document.documentElement.getAttribute('data-theme')==='dark')?
-                    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css':
+                    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css' :
                     'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
                 document.head.appendChild(link);
             }
         }
-        if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
         else init();
 
         window.__blog = { posts, get currentTag(){return currentTag}, selectTag, navigateHome, reload:init };
